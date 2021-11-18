@@ -1,0 +1,36 @@
+{
+  "name": "njnest",
+  "version": "1.0.0",
+  "description": "Node.js API&WEB HTTP Server",
+  "main": "njnest.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajiedx/njnest.git"
+  },
+  "keywords": [
+    "Web",
+    "Server",
+    "API",
+    "Web",
+    "Server",
+    "Node.js",
+    "HTTP"
+  ],
+  "author": "ajiedx",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ajiedx/njnest/issues"
+  },
+  "homepage": "https://github.com/ajiedx/njnest#readme",
+  "dependencies": {
+    "njfile": "^1.0.1",
+    "njreloader": "^1.0.1",
+    "njsuper": "^1.0.0"
+  }
+}

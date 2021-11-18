@@ -1,0 +1,11 @@
+{
+    "name": "srv.js",
+    "version": "1.0.0",
+    "exports": {
+        ".": "./main.js"
+    },
+	"scripts": {
+		"start": "node srv.js",
+		"watcher": "node watch.js"
+	}
+}
