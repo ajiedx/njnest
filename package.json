@@ -1,6 +1,6 @@
 {
   "name": "njnest",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Node.js API&WEB HTTP Server",
   "main": "njnest.js",
   "directories": {
@@ -29,8 +29,8 @@
   },
   "homepage": "https://github.com/ajiedx/njnest#readme",
   "dependencies": {
-    "njfile": "^1.0.5",
-    "njreloader": "^1.0.3",
-    "njsuper": "^1.0.0"
+    "njfile": "^1.2.1",
+    "njreloader": "^1.2.0",
+    "njsuper": "^1.0.1"
   }
 }

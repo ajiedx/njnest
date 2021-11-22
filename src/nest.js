@@ -44,6 +44,7 @@ class NjNest extends NjSuper {
     startWatcher() {
         if (this.reloader instanceof NjReloader) {
             this.watcher = new NjWatcher(this.reloader, {enitity: this.watcherSettings})
+
         }
 
         this.watcher.start()

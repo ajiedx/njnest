@@ -2,16 +2,16 @@ const http = require('http');
 const { NjNest } = require('../../njnest')
 
 const watcherSettings = {
-    front: { dirs: ['./src', './srca'], ext: ['js']}, 
+    // front: { dirs: ['./src', './srca'], ext: ['js']}, 
     back: { 
-      dirs: ['./srcb', './src'], 
+      dirs: ['./src', './srca', './srcb'], 
       ext: ['js'],
       host: 'localhost',
       port: 8000,
       batch: 'run.bat'
     }
   }
-  
+
 const options = {
     serverOptions: {
     // key: fs.readFileSync('localhost.decrypted.key'),

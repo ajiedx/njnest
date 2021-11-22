@@ -1,44 +1,49 @@
 const { NjUrl } = require('../../njnest')
-// dir.setDir('./src', 'src')
-// dir.setExt('src', 'js')
-// console.log(dir)
-// const client = new Client()
-const template = "<html>${rsp} ${asdas} ${yo}</html>"
 
-function parse(template) {
-  const regex = /\$[\{]\w+}/g
-  const found = template.match(regex)
-  var name = {}
-  for (const i in found) {
-    // console.log(found[i].slice(0, -1))
-    Object.assign(name, {[found[i].slice(0, -1).slice(2)]: {regfound: found[i]}})    
-  }
-  // console.log(name)
-  // console.log(found)
-  // console.log(template.replaceAll(regex, 'what'))
+const htmlMeta = {
+  title: 'Default Title',
+  description: 'Default Description',
+  author: 'Ajiedx',
+  // template: 
+  // body:
 }
 
-parse(template)
 const webapp = new NjUrl('bane', {
-  wrapper: (rsp) => {
+  // wrapper: (rsp) => {
 
-  },
+  // },
+  // parser: '',
+  htmlMeta,
+  jsScripts: ['./src/edit.js'],
+  jsDir: ['./src'],
+  cssDir: ['./src/css'],
+  cssLinks: ['./src/css/main.css'],
   type: 'web'
 })
 
-webapp.on('/qwe', {
-  name: 'aaaa',
-  response: () => {
-    return 'Hey'
-  }
-})
-webapp.on('/qwe', {
-  name: 'heys',
-  response: () => {
-    return 'Hey'
+
+
+webapp.on('/', {
+  name: 'index',
+  controller: 'default',
+  response: (ctrl, req, res) => {
+
+    ctrl.html.replaceBody('<h2>NEW BODY</h2>')
+    ctrl.html.replaceMeta('title', 'New Title')
+    return ctrl
   }
 })
 
+webapp.on('/important', {
+  name: 'important',
+  controller: 'default',
+  response: (ctrl, req, res) => {
+
+    ctrl.html.replaceBody('<h3>Important BODY</h3>')
+    ctrl.html.replaceMeta('title', 'Important Title')
+    return ctrl
+  }
+})
 const api = new NjUrl('bane', {
   type: 'api'
 })
