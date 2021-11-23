@@ -21,9 +21,7 @@ class NjNest extends NjSuper {
             } else {
                 this.reloader = new NjReloader(this.watcherSettings, {conn: this.conn})
 
-                this.reloader.set('front', (file) => {
-                    console.log('Hey')
-                })
+                this.reloader.set('front', 'updateJs', this.conn)
 
                 this.reloader.set('back', 'restartServer', this.conn)
                 this.startClient('watcher')

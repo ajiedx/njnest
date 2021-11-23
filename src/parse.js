@@ -24,6 +24,11 @@ class NjParser extends NjUrlSuper {
 
             }
 
+            if (this.reload == true) {
+
+                this.html.addLinkScripts('js', ['/jinload.js'])
+            }
+
             this.html.addLinkScripts('css', this.cssLinks)
             this.html.addLinkScripts('js', this.jsScripts)
 

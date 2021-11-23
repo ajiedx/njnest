@@ -15,12 +15,16 @@ class NjHtml extends NjSuper {
 
 
     addLinkScripts(jsorcss, scriptsorlinks) {
+
+        
         for (const i in scriptsorlinks) {
             if(scriptsorlinks[i] instanceof NjFile) {
+                
                 const path = scriptsorlinks[i].path.slice(2, scriptsorlinks[i].path.length)
+                
 
                 var brackets = '<?'
-                if (jsorcss == 'js') {
+                if (jsorcss === 'js') {
                     brackets = '<script src="'+path+'"></script>\n</head>'
                 } else {
                     brackets = '<link rel="stylesheet" href="'+path+'">\n</head>'
@@ -28,10 +32,19 @@ class NjHtml extends NjSuper {
 
                 this.dt = this.dt.replace(this.headReg, brackets)
                  
+            } else {
+                if (jsorcss === 'js') {
+                    if (this.typeof(scriptsorlinks) == 'array') {
+                        const path = scriptsorlinks[i]
+                        const brackets = '<script src="'+path+'"></script>\n</head>'
+                        this.dt = this.dt.replace(this.headReg, brackets)
+                    }
+                    
+                }
             }
         }
 
-        return new NjHtml(this.dt, this)
+        // return new NjHtml(this.dt, this)
     }
 
     replaceBody(value) {

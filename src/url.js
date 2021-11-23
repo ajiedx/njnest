@@ -1,5 +1,6 @@
 const { NjUrlResponse } = require('./url/response')
 const { NjParser } = require('./parse')
+
 const { NjFiles, NjFile } = require('njfile')
 
 class NjUrl extends NjParser {
@@ -14,14 +15,79 @@ class NjUrl extends NjParser {
             this.wrap = this.wrapper
         }
 
-        if (this.type == 'web') {
+        if (this.type == 'web') {  
             this.onScriptsLinks()
             // console.log(this.paths)
         }
+
         
     }
 
     onScriptsLinks() {
+
+        if (this.reload == true) {
+            for (const i in this.njfile) {
+                if(this.njfile[i] instanceof NjFile) {
+                    const path = this.njfile[i].url
+
+                    this.on(path, {
+                        response: () => {
+                            return this.njfile[i].content
+                        }
+                    })
+                }
+                
+            }
+
+            this.on('/jinload', {
+ 
+                response: (ctrl, req, res) => {
+                    const raw = req.rawHeaders
+                    // console.log(this.js)
+                    if (raw.includes('jinreload')) {
+                        console.log(raw[raw.indexOf('jinreload') + 1])
+                        this.updatefile = raw[raw.indexOf('jinreload') + 1]
+                    } else {
+                        if (raw.includes('jinload')) {
+                            console.log(raw[raw.indexOf('jinload') + 1])
+                            this.loadfile = raw[raw.indexOf('jinload') + 1]
+
+                            for (const i in this.js) {
+                                if (this.js[i] instanceof NjFiles) {
+                                    for (const l in this.js[i]) {
+                                        if (this.js[i][l] instanceof NjFile) {
+                                            if (this.js[i][l].name === this.loadfile) {
+                                                if (!this.js[i][l].content) {
+                                                    this.js[i][l].updateFile()
+                                                    this.js[i][l].toString()
+                                                    return this.js[i][l].content
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // return rsp({file: this.loadfile})
+
+                        }
+                
+                        if (raw.includes('jinupdate')) {
+                            if (this.updatefile) {
+                                return this.updatefile
+                            } else {
+                                return 'No updates found'
+                            }
+                            
+                        }
+                
+                        
+                    }
+
+                }
+            })
+        }   
+
         for (const i in this.jsScripts) {
             if(this.jsScripts[i] instanceof NjFile) {
                 this.jsScripts[i].toString()
@@ -105,25 +171,31 @@ class NjUrl extends NjParser {
 
     check(rqs) {
 
-        for (const i in this.paths) {
-            
-            if(this.paths[i].path === rqs.url) {
-
-                this.status = true
+        if (this.paths) {
+            for (const i in this.paths) {
+                // console.log(this.paths[i].path, rqs.url)
+                if(this.paths[i].path === rqs.url) {
+                    this.paths[i].status = true
+                    this.status = true
+                    // this.head = 200
+                    // if(this.paths[i].head) {
+                    //     this.head = this.paths[i].head  
+                    // }
+                    this.active = i
     
-                if(this.paths[i].head) {
-                    this.head = this.paths[i].head  
-                }
-                this.active = i
+                } 
+                // else {
+                //     this.status = 404
+                //     this.head = 404
+                //     this.active = 404
+    
+                // }
+            }
 
-            } 
-            
-            // else {
-            //     this.status = 404
-            //     this.head = 404
-            //     this.active = 404
-            // }
         }
+        
+
+
 
     }
 

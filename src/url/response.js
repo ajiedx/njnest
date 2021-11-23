@@ -11,13 +11,13 @@ class NjUrlResponse extends NjSuper {
                 
                 if(this.controller == 'default') {
                     
-                    this.controller = new NjController('this.name', this)
+                    this.controller = new NjController('NjController', this)
                     // console.log('aaaaaaaaa', this.controller)
                 }
             } else if (this.typeof(this.controller) == 'function') {
                 
             } else if (this.controller instanceof NjController) {
-                this.controller = new NjController('this.name', this)
+                this.controller = new NjController('NjController', this)
             } else if (this.controller instanceof Object) {
                 this.controller = new this.controller(this)
             }

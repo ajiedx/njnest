@@ -2,9 +2,12 @@ const http = require('http');
 const { NjNest } = require('../../njnest')
 
 const watcherSettings = {
-    // front: { dirs: ['./src', './srca'], ext: ['js']}, 
+    front: { dirs: ['./src'], ext: ['js'],
+    host: 'localhost',
+    port: 8000
+  }, 
     back: { 
-      dirs: ['./src', './srca', './srcb'], 
+      dirs: ['./srca', './srcb'], 
       ext: ['js'],
       host: 'localhost',
       port: 8000,

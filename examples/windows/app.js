@@ -13,8 +13,9 @@ const webapp = new NjUrl('bane', {
 
   // },
   // parser: '',
+  reload: true,
   htmlMeta,
-  jsScripts: ['./src/edit.js'],
+  jsScripts: ['./src/main.js'],
   jsDir: ['./src'],
   cssDir: ['./src/css'],
   cssLinks: ['./src/css/main.css'],

@@ -4,7 +4,7 @@ const { NjCheck } = require('./connection/check')
 class NjConnection extends NjCheck {
     constructor(dt, objx, t) {
         super(dt, objx, t)
-
+        // this.head = 200
     }
 
     startServer() {
@@ -14,6 +14,7 @@ class NjConnection extends NjCheck {
 
                 rsp.writeHead(this.head)
                 rsp.end(this.response)
+                
             }).listen('8000')
         } catch (err) {
             console.log(err)

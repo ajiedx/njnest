@@ -12,7 +12,7 @@ class NjWatcher extends NjSuper {
             // }
             this.dt.start()
             this.start()
-        }, 2000)
+        }, 3000)
     }
     
     start() {
