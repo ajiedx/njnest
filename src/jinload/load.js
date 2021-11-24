@@ -28,10 +28,11 @@ class JinLoad extends NjSuper {
         
         xhr.open('GET', '/jinload', true)
         xhr.setRequestHeader('jinload', name)
+
         xhr.onload = function () {
 
             eval(xhr.response)
-            console.log()
+
             // if (target) {
             //     target.dispathEvent(event)
             // }
@@ -50,7 +51,7 @@ class JinLoad extends NjSuper {
 
             worker.postMessage('http://localhost:8000')
             worker.onmessage = function(event) {
-                console.log(event.data.split('/')[0], 'asasd')
+
                 if (window.jinload) {
                     window.jinload.js(event.data.split('/')[0])
                 }

@@ -45,23 +45,24 @@ class NjUrl extends NjParser {
                     const raw = req.rawHeaders
                     // console.log(this.js)
                     if (raw.includes('jinreload')) {
-                        console.log(raw[raw.indexOf('jinreload') + 1])
+
                         this.updatefile = raw[raw.indexOf('jinreload') + 1]
                     } else {
                         if (raw.includes('jinload')) {
-                            console.log(raw[raw.indexOf('jinload') + 1])
+  
                             this.loadfile = raw[raw.indexOf('jinload') + 1]
 
                             for (const i in this.js) {
                                 if (this.js[i] instanceof NjFiles) {
                                     for (const l in this.js[i]) {
                                         if (this.js[i][l] instanceof NjFile) {
+
                                             if (this.js[i][l].name === this.loadfile) {
-                                                if (!this.js[i][l].content) {
-                                                    this.js[i][l].updateFile()
-                                                    this.js[i][l].toString()
-                                                    return this.js[i][l].content
-                                                }
+                                                this.js[i][l].updateFile()
+                                                this.js[i][l].toString()
+
+                                                return this.js[i][l].content
+
                                             }
                                         }
                                     }
