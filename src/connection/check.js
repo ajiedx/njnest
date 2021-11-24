@@ -1,4 +1,4 @@
-const { NjUrlResponse } = require('njnest/src/url/response')
+// const { NjUrlResponse } = require('njnest/src/url/response')
 const { NjSuper } = require('njsuper')
 
 class NjCheck extends NjSuper {
