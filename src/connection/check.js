@@ -11,9 +11,9 @@ class NjCheck extends NjSuper {
 
     
     checkWatcher(raw) {
-
         if(raw.includes('watcher')) {
             if (raw[raw.indexOf('watcher') + 1] === 'restartServer') {
+                
                 throw Error
             }
         } 

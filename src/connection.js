@@ -8,7 +8,8 @@ class NjConnection extends NjCheck {
     }
 
     startServer() {
-
+        console.log('\x1b[33m%s\x1b[0m', 'Server is running on',
+        this.serverOptions.host + ':' + this.serverOptions.port)
         try {
             this.srv = this.dt.createServer(this.serverOptions, (rqs, rsp) => {
                 this.checkDefault(rqs, rsp)
@@ -16,7 +17,8 @@ class NjConnection extends NjCheck {
                 rsp.writeHead(this.head)
                 rsp.end(this.response)
                 
-            }).listen('8000')
+            }).listen(this.port)
+
         } catch (err) {
             console.log(err)
         }

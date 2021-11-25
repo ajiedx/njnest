@@ -7,9 +7,6 @@ class NjWatcher extends NjSuper {
 
     loop() {
         setTimeout(() => {
-            // for (const i in this.entity) {
-                
-            // }
             this.dt.start()
             this.start()
         }, 3000)

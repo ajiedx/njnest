@@ -4,7 +4,9 @@ const { NjNest } = require('../../njnest')
 
 const options = {
   serverOptions: {
-    watcher: true
+    watcher: true,
+    host: 'localhost',
+    port: 8000,
     // key: fs.readFileSync('localhost.decrypted.key'),
     // cert: fs.readFileSync('localhost.crt'),
   },

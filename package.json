@@ -29,8 +29,8 @@
   },
   "homepage": "https://github.com/ajiedx/njnest#readme",
   "dependencies": {
-    "njfile": "^1.2.1",
-    "njreloader": "^1.2.0",
-    "njsuper": "^1.0.1"
+    "njfile": "^1.2.2",
+    "njreloader": "^1.2.2",
+    "njsuper": "^1.0.2"
   }
 }

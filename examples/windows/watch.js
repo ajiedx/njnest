@@ -11,7 +11,7 @@ const watcherSettings = {
       ext: ['js'],
       host: 'localhost',
       port: 8000,
-      batch: 'run.bat'
+      batch: 'reload.bat'
     }
   }
 

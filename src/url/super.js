@@ -12,7 +12,11 @@ class NjUrlSuper extends NjSuper {
                 let dirname = __dirname.split(path.sep)
                 dirname = dirname.slice(0, dirname.length - 2)
                 this.njnestdir = dirname.join(path.sep)
-                dirname.push('node_modules')
+                if (dirname[dirname.length - 2] == 'node_modules') {
+                    dirname = dirname.slice(0, dirname.length - 1)
+                } else {
+                    dirname.push('node_modules')
+                }
                 this.nodemodulesdir = dirname.join(path.sep)
 
                 this.njfile = new NjFiles('njfile', {construct: false})

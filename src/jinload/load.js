@@ -5,45 +5,82 @@ class JinLoad extends NjSuper {
         this.files = {}
     }
 
-    js(name) {
-        this.ext = 'js'
+    js(name, state) {
+
         // if (this.path === '') {
         //     this.path = name.split('/').slice(0, -1).join('/')
         //     name = name.split('/').pop().split('.')[0]
         // }
-        
-        
 
-        this.run(name, this.path, eval,
-            this.jinLoadTarget, this.jinLoadEvent, this.ext)
-
-        // this.assign('files', {path: this.path, name}, true)
-
-        this.ext = ''
-    }
-
-    run(name, path, func, target, event, ext) {
-
-        const xhr = new XMLHttpRequest()
-        
-        xhr.open('GET', '/jinload', true)
-        xhr.setRequestHeader('jinload', name)
-
-        xhr.onload = function () {
-
-            eval(xhr.response)
-
-            // if (target) {
-            //     target.dispathEvent(event)
-            // }
-
-            xhr.abort()
+        if (state) {
+            window.newJinLoadState = state
         }
-        
-        xhr.send()
+
+        if (window.xhr) {
+            window.xhr.open('GET', '/jinload', true)
+            window.xhr.setRequestHeader('jinload', name)
+            window.xhr.setRequestHeader('extension', 'js')
+
+            window.xhr.onload = function () {
+
+                if (state) {
+                    if (state == 'update') {
+                        console.log('*****************        '+name+'.js        *****************')
+                    }
+                    eval(xhr.response)
+                    if (window.jinLoadTarget) {
+                        window.jinLoadTarget(window.jinLoadEvent)
+                    }
+                } else {
+                    eval(xhr.response)
+                }
+
+                window.xhr.abort()
+            }
+            
+            window.xhr.send()
+        }
 
     }
 
+    css(name, state) {
+        if (state) {
+            window.newJinLoadState = state
+        }
+
+        if (window.xhr) {
+            window.xhr.open('GET', '/jinload', true)
+            window.xhr.setRequestHeader('jinload', name)
+            window.xhr.setRequestHeader('extension', 'css')
+
+            window.xhr.onload = function () {
+    
+                
+                if (state) {
+                    if (state == 'update') {
+                        if (window.jincss) {
+                            window.jincss.load(xhr.reponse)
+                        }
+                    }
+                    
+                    if (window.jinLoadTarget) {
+                        window.jinLoadTarget(window.jinLoadEvent)
+                    }
+                }
+
+                if (window.jincss) {
+                    window.jincss.load(xhr.reponse)
+                } else {
+                    console.log('error css')
+                }
+
+    
+                window.xhr.abort()
+            }
+            
+            window.xhr.send()
+        }
+    }
     startReload() {
         window
         if (window.Worker) {
@@ -53,7 +90,7 @@ class JinLoad extends NjSuper {
             worker.onmessage = function(event) {
 
                 if (window.jinload) {
-                    window.jinload.js(event.data.split('/')[0])
+                    window.jinload.js(event.data.split('/')[0], 'update')
                 }
             }
         }
@@ -68,9 +105,9 @@ const jinLoadEvent = new CustomEvent('onjinload', {
     }}
 })
 
-jinLoadTarget = new EventTarget()
-
-window.jinload = new JinLoad(eval, {jinLoadEvent, jinLoadTarget})
+const jinLoadTarget = new EventTarget()
+window.xhr = new XMLHttpRequest()
+window.jinload = new JinLoad()
 
 jinLoadTarget.addEventListener('onjinload', function(jinEvent) {
     if (window.newJinLoadState) {
