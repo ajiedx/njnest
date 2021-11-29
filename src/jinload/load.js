@@ -17,9 +17,7 @@ class JinLoad extends NjSuper {
         }
 
         if (window.xhr) {
-            window.xhr.open('GET', '/jinload', true)
-            window.xhr.setRequestHeader('jinload', name)
-            window.xhr.setRequestHeader('extension', 'js')
+            window.xhr.open('GET', '/jinload/' + name + '.js', true)
 
             window.xhr.onload = function () {
 
@@ -88,10 +86,21 @@ class JinLoad extends NjSuper {
 
             worker.postMessage('http://localhost:8000')
             worker.onmessage = function(event) {
-
-                if (window.jinload) {
-                    window.jinload.js(event.data.split('/')[0], 'update')
+                // console.log(event.data, '')
+                if (event.data === 'RELOAD') {
+                    location.reload()
+                } else {
+                    if (window.jinload) {
+                        this.reloadFileName = event.data.split('/')[0].split('.')[0]
+                        this.reloadExt = event.data.split('/')[0].split('.')[1]
+                        console.log(this.reloadFileName)
+                        if (this.reloadExt === 'js') {
+                            window.jinload.js(this.reloadFileName, 'update')
+                        }
+                        
+                    }
                 }
+                
             }
         }
     }
@@ -128,8 +137,7 @@ document.onreadystatechange = function () {
     if(document.readyState === 'complete') {
         window.newJinLoadState = 'ready'
 
-        jinupdate = true
-
         jinload.startReload()
+        jinload.js('jincss')
     }
 }

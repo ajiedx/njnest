@@ -1,4 +1,3 @@
-const http = require('http')
 const { api, webapp } = require('./app')
 const { NjNest } = require('../../njnest')
 
@@ -13,9 +12,7 @@ const options = {
   urls: {webapp, api},
 }
 
-options.serverOptions.agent = new http.Agent(options.serverOptions)
 
-
-const conn = new NjNest(http, options)
+const conn = new NjNest('njnest', options)
 
 conn.start()

@@ -25,16 +25,16 @@ class NjUrlResponse extends NjSuper {
         
     }
 
-    rsp(req, res) {
+    rsp(req) {
         if (this.controller) {
             if (this.typeof(this.controller) == 'function') {
-                return this.controller(this.response, req, res)
+                return this.controller(this.response, req)
             } else {
-                return this.controller.crsp(this.response, req, res)
+                return this.controller.crsp(this.response, req)
             }
             
         } else {
-            return this.response({html: this.html}, req, res)
+            return this.response({html: this.html}, req)
         }
     }
     

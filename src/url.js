@@ -28,9 +28,7 @@ class NjUrl extends NjParser {
         if (this.reload == true) {
             for (const i in this.njfile) {
                 if(this.njfile[i] instanceof NjFile) {
-                    const path = this.njfile[i].url
-
-                    this.on(path, {
+                    this.on(this.njfile[i].url, {
                         response: () => {
                             return this.njfile[i].content
                         }
@@ -38,56 +36,8 @@ class NjUrl extends NjParser {
                 }
                 
             }
+        }    
 
-            this.on('/jinload', {
- 
-                response: (ctrl, req, res) => {
-                    const raw = req.rawHeaders
-                    // console.log(this.js)
-                    if (raw.includes('jinreload')) {
-
-                        this.updatefile = raw[raw.indexOf('jinreload') + 1]
-                    } else {
-                        if (raw.includes('jinload')) {
-  
-                            this.loadfile = raw[raw.indexOf('jinload') + 1]
-
-                            for (const i in this.js) {
-                                if (this.js[i] instanceof NjFiles) {
-                                    for (const l in this.js[i]) {
-                                        if (this.js[i][l] instanceof NjFile) {
-
-                                            if (this.js[i][l].name === this.loadfile) {
-                                                this.js[i][l].updateFile()
-                                                this.js[i][l].toString()
-
-                                                return this.js[i][l].content
-
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // return rsp({file: this.loadfile})
-
-                        }
-                
-                        if (raw.includes('jinupdate')) {
-                            if (this.updatefile) {
-                                return this.updatefile
-                            } else {
-                                return 'No updates found'
-                            }
-                            
-                        }
-                
-                        
-                    }
-
-                }
-            })
-        }   
 
         for (const i in this.jsScripts) {
             if(this.jsScripts[i] instanceof NjFile) {
@@ -170,12 +120,12 @@ class NjUrl extends NjParser {
     }
 
 
-    check(rqs) {
+    check(path) {
 
         if (this.paths) {
             for (const i in this.paths) {
                 // console.log(this.paths[i].path, rqs.url)
-                if(this.paths[i].path === rqs.url) {
+                if(this.paths[i].path === path) {
                     this.paths[i].status = true
                     this.status = true
                     // this.head = 200

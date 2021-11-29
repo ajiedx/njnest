@@ -1,4 +1,3 @@
-const http = require('http');
 const { NjNest } = require('../../njnest')
 
 const watcherSettings = {
@@ -25,10 +24,9 @@ const options = {
     env: 'dev'
 }
 
-options.serverOptions.agent = new http.Agent(options.serverOptions)
 
 
-const conn = new NjNest(http, options)
+const conn = new NjNest('njnest', options)
 
 conn.start()
   

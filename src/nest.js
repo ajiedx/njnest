@@ -1,7 +1,7 @@
 const { NjConnection } = require('./connection')
 const { NjUrl } = require('./url')
 const { NjWatcher } = require('./nest/watcher')
-const { NjReloader } = require('njreloader')
+const { NjReload } = require('njreload')
 const { NjSuper } = require('njsuper')
 const { NjParser } = require('./parse')
 
@@ -17,11 +17,15 @@ class NjNest extends NjSuper {
             // if (this.watcher) {
             if (!this.watcher) {
 
-                this.conn.startServer(true)
-            } else {
-                this.reloader = new NjReloader(this.watcherSettings, {conn: this.conn})
+                if (this.conn) {
+                    this.conn.startServer(true)
+                }
 
-                this.reloader.set('front', 'updateJs', this.conn)
+                
+            } else {
+                this.reloader = new NjReload(this.watcherSettings, {conn: this.conn})
+
+                this.reloader.set('front', 'jinupdate', this.conn)
 
                 this.reloader.set('back', 'restartServer', this.conn)
                 this.startClient('watcher')
@@ -40,7 +44,7 @@ class NjNest extends NjSuper {
     }
     
     startWatcher() {
-        if (this.reloader instanceof NjReloader) {
+        if (this.reloader instanceof NjReload) {
             this.watcher = new NjWatcher(this.reloader, {enitity: this.watcherSettings})
 
         }

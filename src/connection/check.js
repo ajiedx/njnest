@@ -1,72 +1,146 @@
-// const { NjUrlResponse } = require('njnest/src/url/response')
-const { NjSuper } = require('njsuper')
+const { NjResponse } = require('./response')
+const { NjFiles } = require('njfile')
 
-class NjCheck extends NjSuper {
+class NjCheck extends NjResponse {
 
 
     constructor(dt, objx, t) {
         super(dt, objx, t)
         this.defaultMsg = 'Hello World!'
+        this.reloaded = true
+        this.controller = new AbortController()
+
     }
 
-    
-    checkWatcher(raw) {
-        if(raw.includes('watcher')) {
-            if (raw[raw.indexOf('watcher') + 1] === 'restartServer') {
-                
-                throw Error
+
+    async rqs(data) {
+        const [firstLine, ...otherLines] = data.toString().split('\n')
+        const [perspective, path, network] = firstLine.trim().split(' ')
+
+        if(this.compareBegining('HTTP', network)) {
+            this.httpVersion = network + ' '
+            const headers = Object.fromEntries(otherLines.filter(_=>_)
+            .map(line=>line.split(':').map(part=>part.trim()))
+            .map(([name, ...rest]) => [name, rest.join(' ')]))
+
+            this.request = {
+                perspective,
+                path,
+                network,
+                headers,
             }
         } 
+        
+        // else if (this.compareBegining('LOCAL', network)) {
+        //     console.log(data.toString())
+        //     this.request = {
+        //         perspective,
+        //         path,
+        //         network
+        //     }
+        // }
+        
+
+        // console.log(this.compareBegining('text/html', this.request.headers.Accept))
+
+        // console.log(this.request )
+        // console.log(ps['a-d&']['a-d'])
+       
+
     }
 
-    async checkDefault(rqs, rsp) {
-        if (this.serverOptions.watcher) {
-            this.checkWatcher(rqs.rawHeaders)
+    async updateReload() {
+        if (this.reloaded) {
+            this.response = this.codeRes(200, '*/*', 'Reload Browser')  
+            this.reloaded = false
+        } else if (this.reloadFile) {
+            this.response = this.codeRes(200, '*/*', this.reloadFile) 
+        } else {
+            this.response =  this.codeRes(200, '*/*', 'No Updates Found') 
         }
-        // console.log(this.urls)
-        for (const i in this.urls) {
-            this.urls[i].check(rqs)
-            // console.log(i)
-            if(this.urls[i].status == true) {
-                // console.log(this.urls[i].paths[this.urls[i].active].status, 'asdasdadas')
-                
-                if (this.urls[i].paths[this.urls[i].active].status == true) {
-                    
-                    // console.log(this.urls[i].paths[this.urls[i].active], 'active urls')
-                    if (this.urls[i].paths) {
+    }
 
-                        if (this.urls[i].paths[this.urls[i].active].status == true) {
-                            try {
-                                this.head = 200 // this.urls[i].paths[i].head
-
-                                this.response = this.urls[i].paths[this.urls[i].active].rsp(rqs, rsp)
-                                this.urls[i].status = false
-                                this.urls[i].paths[this.urls[i].active].status = false
-                            } catch (error) {
-                                console.error(error)
-                                this.head = 200
+    async checkReload(data) {
+        const [firstLine, ...otherLines] = data.toString().split('\n')
+        const [perspective, path, network] = firstLine.trim().split(' ')
+        if (this.compareBegining('RELOAD', perspective)) {
+            if (this.compareBegining('/jinload', path)) {
+                this.reloadFile = path.split('/')
+                this.reloadFile = this.reloadFile[2] + '/' + this.reloadFile[3]
+            } else {
+                this.controller.abort()
+                this.response = 'Aborted..\r\n'
+            }
+        } else if (this.compareBegining('/jinload', path)) {
+            if (this.compareBegining('/jinload.js', path)) {
+                this.check(data)
+            } else {
+                const jinload = path.split('/')
+                if (jinload[2] === 'update') {
+                    this.updateReload()
+                } else {
+                    const file = jinload[2].split('.')
+                    for (const i in this.urls) {
+                        if (this.urls[i][file[1]]) {
+                            for (const l in this.urls[i][file[1]]) {
+                                if (this.urls[i][file[1]][l] instanceof NjFiles) {
+                                    if (this.urls[i][file[1]][l][file[0]]) {
+                                        this.urls[i][file[1]][l][file[0]].updateFile()
+                                        this.urls[i][file[1]][l][file[0]].toString()
+                                        this.response = this.codeRes(200, file[1],
+                                            this.urls[i][file[1]][l][file[0]].content)
+                                    
+                                    }
+                                }
                             }
                         }
-
-
-    
                     }
 
+                }
 
-                } 
-                
+            }
 
-            } 
 
             
-
-            // else {
-            //     this.response = 'hello world'
-            //     this.head = 200
-            //     this.urls[i].status = false
-            // }
-
+        } else {
+            this.check(data)
         }
+    }
+
+    async check(data) {
+        this.rqs(data)
+
+        for(const i in this.urls) {
+
+            if (this.urls[i].type === 'web') {
+                if (this.compareBegining('text/html', this.request.headers.Accept)) {
+                    
+                    this.ext = 'html'
+
+                } else if (this.compareBegining('text/js', this.request.headers.Accept)) {
+                    
+                    this.ext = 'js'
+                } else if (this.compareBegining('text/css', this.request.headers.Accept)) {
+                    this.ext = 'css'
+                }
+                
+                this.urls[i].check(this.request.path)
+                this.qualify(this.urls[i]) 
+            } 
+            
+            
+        }
+
+        
+        // else {
+        //     for(const i in this.urls) {
+        //         if (this.urls[i].type !== 'web') {
+        //             this.urls[i].check(this.request.path)
+        //             this.qualify(this.urls[i]) 
+        //         }
+        //     }
+        // }
+
     }
 
 }

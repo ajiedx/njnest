@@ -4,12 +4,11 @@ const reqUpdate = (host, req, timer) => {
 }
 
 function responseUpdate(res, req, host) {
-
     if (!req) {
         xhr = new XMLHttpRequest()
         reqUpdate(host, xhr, 3000)
     } else {
-        
+
         if (res) {
             if(self.update == undefined) {
                 Object.defineProperty(self, 'update', {
@@ -21,11 +20,11 @@ function responseUpdate(res, req, host) {
                 
                   reqUpdate(host, req, 3000)
             } else if (self.update == res) {
-
                 reqUpdate(host, req, 3000)
             } else {
+
                 reqUpdate(host, req, 3000)
-                
+
                 self.postMessage(res)
                 self.update = res
             }
@@ -38,11 +37,13 @@ function responseUpdate(res, req, host) {
 }
 
 function requestUpdate(host, xhr) {
-    xhr.open('GET', host + '/jinload', true)
-    xhr.setRequestHeader('jinupdate', '')
+    xhr.open('GET', host + '/jinload/update', true)
+
     xhr.onreadystatechange = function () {
         if(xhr.readyState == 4 && xhr.status == 200) {
             responseUpdate(xhr.responseText, xhr, host)
+        } else if (xhr.readyState == 4 && xhr.status == 0) {
+            self.postMessage('RELOAD')
         }
     }
 
@@ -51,7 +52,13 @@ function requestUpdate(host, xhr) {
 
 onmessage = function (event) {
     if (event) {
-        const xhr = new XMLHttpRequest()
-        requestUpdate(event.data, xhr)
+        try {
+            const xhr = new XMLHttpRequest()
+            requestUpdate(event.data, xhr)
+        } catch (error) {
+            const xhr = new XMLHttpRequest()
+            requestUpdate(event.data, xhr)
+        }
+
     }
 }

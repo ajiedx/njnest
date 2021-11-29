@@ -24,6 +24,7 @@ class NjUrlSuper extends NjSuper {
                 this.njfile.defineFile('njsuper', {path: this.nodemodulesdir + path.sep +'njsuper'+path.sep+'njsuper.js', string: true})
                 let load = ['', 'src', 'jinload', 'load.js']
                 let update = ['', 'src', 'jinload', 'update.js']
+                let css = ['', 'src', 'jinload', 'css.js']
 
                 let njsupercontent = this.njfile.njsuper.content
                 njsupercontent = njsupercontent.split('\n')
@@ -32,12 +33,14 @@ class NjUrlSuper extends NjSuper {
 
                 load = load.join(path.sep)
                 update = update.join(path.sep)
-
+                css = css.join(path.sep)
                 this.njfile.defineFile('jinload', {path: this.njnestdir + load, url: '/jinload.js', string: true})
-                this.njfile.defineFile('jupdate', {path: this.njnestdir + update, url: '/jinupdate.js', string: true})
+                this.njfile.defineFile('jincss', {path: this.njnestdir + css, url: '/jincss.js', string: true})
+                this.njfile.defineFile('jinupdate', {path: this.njnestdir + update, url: '/jinupdate.js', string: true})
+
 
                 this.njfile.jinload.content = this.njfile.njsuper.content + this.njfile.jinload.content
-                this.njfile.jupdate.content = this.njfile.njsuper.content + this.njfile.jupdate.content
+                this.njfile.jinupdate.content = this.njfile.njsuper.content + this.njfile.jinupdate.content
                 delete this.njfile.njsuper
                 
 
@@ -46,6 +49,7 @@ class NjUrlSuper extends NjSuper {
 
             if (this.jsDir) {
                 this.js = new NjFiles('js', {dirs: this.jsDir, ext: ['js'], dir: false})
+
             }
     
             if (this.jsScripts) {
