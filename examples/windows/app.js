@@ -8,6 +8,20 @@ const htmlMeta = {
   // body:
 }
 
+const api = new NjUrl('bane', {
+  url: '/api',
+
+})
+
+api.on('/user', {
+  controller: 'default',
+  idx: 'username',
+  response: (ctrl, req) => {
+    
+    return ctrl
+  }
+})
+
 const webapp = new NjUrl('bane', {
   // wrapper: (rsp) => {
 
@@ -15,11 +29,10 @@ const webapp = new NjUrl('bane', {
   // parser: '',
   reload: true,
   htmlMeta,
-  jsScripts: ['./src/main.js'],
+  jinload: ['main.js'],
   jsDir: ['./src'],
   cssDir: ['./src/css'],
   cssLinks: ['./src/css/main.css'],
-  type: 'web'
 })
 
 
@@ -35,6 +48,7 @@ webapp.on('/', {
   }
 })
 
+
 webapp.on('/important', {
   name: 'important',
   controller: 'default',
@@ -45,8 +59,6 @@ webapp.on('/important', {
     return ctrl
   }
 })
-const api = new NjUrl('bane', {
-  type: 'api'
-})
+
 
 module.exports = { api, webapp }
