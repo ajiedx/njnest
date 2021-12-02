@@ -1,4 +1,5 @@
 const { NjConnection } = require('./connection')
+const { NjController } = require('./url/controller')
 const { NjUrl } = require('./url')
 const { NjWatcher } = require('./nest/watcher')
 const { NjReload } = require('njreload')
@@ -13,27 +14,30 @@ class NjNest extends NjSuper {
     
 
     start() {
-        if (this.env === 'dev') {
-            // if (this.watcher) {
-            if (!this.watcher) {
 
-                if (this.conn) {
-                    this.conn.startServer(true)
+        if (this.njreload) {
+            this.reload = new NjReload(this.njreload)
+            for (const i in this.reload.dt) {
+                this.reload.assign(i, {host: this.serverOptions.host, port: this.serverOptions.port})
+                if (this.reload.dt[i].reloader) {
+                    if (this.typeof(this.reload.dt[i].reloader) === 'string') {
+                        if (this.reload.dt[i].reloader === 'jinreload') {
+                            this.reload.set(i, 'jinupdate')
+                        } else if (this.reload.dt[i].reloader === 'njreload') {
+                            this.reload.set(i, 'restartServer')
+                        }
+                    } 
+                } else {
+                    this.reload.set(i)
                 }
-
-                
-            } else {
-                this.reloader = new NjReload(this.watcherSettings, {conn: this.conn})
-
-                this.reloader.set('front', 'jinupdate', this.conn)
-
-                this.reloader.set('back', 'restartServer', this.conn)
-                this.startClient('watcher')
             }
-            // }
+            this.startClient('watcher')
         } else {
             this.conn.startServer()
+
         }
+
+  
     }
 
     startClient(name) {
@@ -44,8 +48,8 @@ class NjNest extends NjSuper {
     }
     
     startWatcher() {
-        if (this.reloader instanceof NjReload) {
-            this.watcher = new NjWatcher(this.reloader, {enitity: this.watcherSettings})
+        if (this.reload instanceof NjReload) {
+            this.watcher = new NjWatcher(this.reload, {enitity: this.watcherSettings})
 
         }
 
@@ -53,4 +57,4 @@ class NjNest extends NjSuper {
     }
 }
 
-module.exports = { NjNest, NjConnection, NjUrl, NjParser }
+module.exports = { NjNest, NjConnection, NjUrl, NjParser, NjController }

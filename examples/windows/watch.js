@@ -1,27 +1,32 @@
 const { NjNest } = require('../../njnest')
 
-const watcherSettings = {
+const njreload = {
     front: { dirs: ['./src'], ext: ['js'],
-    host: 'localhost',
-    port: 8000
+    reloader: 'jinreload'
   }, 
     back: { 
       dirs: ['./srca', './srcb'], 
       ext: ['js'],
-      host: 'localhost',
-      port: 8000,
+      reloader: 'njreload',
       batch: 'reload.bat'
+    },
+    afterback: {
+      dirs: ['./srcb'],
+      ext: ['js'],
+      response: (file) => {
+        console.log('We have restarted NjNest server on ./srcb ' + file.name)
+      }
     }
   }
 
 const options = {
     serverOptions: {
+      host: 'localhost',
+      port: 8000,
     // key: fs.readFileSync('localhost.decrypted.key'),
     // cert: fs.readFileSync('localhost.crt'),
     },
-    watcher: true,
-    watcherSettings,
-    env: 'dev'
+    njreload,
 }
 
 

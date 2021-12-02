@@ -20,7 +20,7 @@ class NjHtml extends NjSuper {
         for (const i in scriptsorlinks) {
             if(scriptsorlinks[i] instanceof NjFile) {
                 
-                const path = scriptsorlinks[i].path.slice(2, scriptsorlinks[i].path.length)
+                const path = scriptsorlinks[i].path
                 
 
                 var brackets = '<?'

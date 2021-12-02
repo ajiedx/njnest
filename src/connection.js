@@ -37,24 +37,24 @@ class NjConnection extends NjCheck {
                 // console.log(socket)
                 
             }).on('error', (err) => {
-                
-                console.log(err)
-                throw err
-                // if (err.code === 'EADDRINUSE') {
-                //     console.log('Address in use, retrying...')
-                //     setTimeout(() => {
-                //         this.conn.close()
-                //         this.conn.listen(serverOptions)
-                //     }, 1000)
-                // }
+
+                if (err.code === 'EADDRINUSE') {
+                    console.log('Address in use, retrying...')
+                    setTimeout(() => {
+                        this.conn.close()
+                        this.conn.listen(serverOptions)
+                    }, 1000)
+                } else if (err) {
+                    console.log(err)
+                    setTimeout(() => {
+                        this.conn.close()
+                        this.conn.listen(serverOptions)
+                    }, 5000);
+                }
             })
 
 
-            this.conn.listen({
-                host: this.serverOptions.host,
-                port: this.serverOptions.port,
-                signal: this.controller.signal
-            })
+            this.conn.listen(serverOptions)
 
 
         } catch (err) {

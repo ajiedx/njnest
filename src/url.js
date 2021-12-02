@@ -11,13 +11,10 @@ class NjUrl extends NjParser {
         this.active = 0
         this.status = false
         this.head = 200
-        if(this.wrapper) {
-            this.wrap = this.wrapper
-        }
 
-        if (this.type == 'web') {  
+        if (this.jsDir) {  
             this.onScriptsLinks()
-            // console.log(this.paths)
+
         }
 
         
@@ -25,7 +22,7 @@ class NjUrl extends NjParser {
 
     onScriptsLinks() {
 
-        if (this.reload == true) {
+        if (this.jinload) {
             for (const i in this.njfile) {
                 if(this.njfile[i] instanceof NjFile) {
                     this.on(this.njfile[i].url, {
@@ -38,35 +35,39 @@ class NjUrl extends NjParser {
             }
         }    
 
-
-        for (const i in this.jsScripts) {
-            if(this.jsScripts[i] instanceof NjFile) {
-                this.jsScripts[i].toString()
-                const path = this.jsScripts[i].path.slice(1, this.jsScripts[i].path.length)
-                this.on(path, {
-                    response: () => {
-                        return this.jsScripts[i].content
-                    }
-                })
+        if (this.jsScripts) {
+            for (const i in this.jsScripts) {
+                if(this.jsScripts[i] instanceof NjFile) {
+                    this.jsScripts[i].toString()
+                    const path = this.jsScripts[i].path.slice(1, this.jsScripts[i].path.length)
+                    this.on(path, {
+                        response: () => {
+                            return this.jsScripts[i].content
+                        }
+                    })
+                }
+            }
+        }
+        
+        if (this.cssLinks) {
+            for (const i in this.cssLinks) {
+                if(this.cssLinks[i] instanceof NjFile) {
+                    this.cssLinks[i].toString()
+                    const path = this.cssLinks[i].path.slice(1, this.cssLinks[i].path.length)
+                    this.on(path, {
+                        response: () => {
+                            return this.cssLinks[i].content
+                        }
+                    })
+                }
             }
         }
 
-        for (const i in this.cssLinks) {
-            if(this.cssLinks[i] instanceof NjFile) {
-                this.cssLinks[i].toString()
-                const path = this.cssLinks[i].path.slice(1, this.cssLinks[i].path.length)
-                this.on(path, {
-                    response: () => {
-                        return this.cssLinks[i].content
-                    }
-                })
-            }
-        }
+        
     }
 
 
     on(path, opt) {
-  
         if (!opt.name) {
             opt.name = path.split('/')
             opt.name = opt.name[opt.name.length - 1]
@@ -83,13 +84,30 @@ class NjUrl extends NjParser {
                 path: opt.path
             } })
         } else {
-            const url = {path}
+            let url
+            if (this.url) {
+                url = {path: this.url + path}
+            } else {
+                url = {path}
+            }
 
-            if (this.type == 'web') {
-                opt.web = true
+
+            if (this.jsDir) {
                 opt.html = this.html
-            } else if (this.type == 'api') {
-                opt.api = true
+            }
+
+            if (opt.idx) {
+                opt.id = opt.idx
+            }
+            
+            if (this.sql) {
+                opt.sql = this.sql
+                opt.sqlName = this.sqlName
+                if(this.sqlRequest) {
+                    opt.sqlRequest = this.sqlRequest
+                } else {
+                    console.log('Provide SQL Request connection function for ' + this.sqlName + ' syntax.')
+                }
             }
 
             
@@ -105,45 +123,102 @@ class NjUrl extends NjParser {
             } else {
                 length = url.length
             }
-            
             if (opt.name) {
-                Object.assign(url, {id: length})
+                Object.assign(url, {pathid: length})
                 this[opt.name] = this.resolveObject(opt.name, url)
             }
-            
-    
+
             Object.assign(this.paths, { [length]: this[opt.name] })
 
         }
-
-
     }
 
 
-    check(path) {
+    check(path, loop) {
 
-        if (this.paths) {
-            for (const i in this.paths) {
-                // console.log(this.paths[i].path, rqs.url)
-                if(this.paths[i].path === path) {
-                    this.paths[i].status = true
+        if(path.includes('/')) {
+            let count = 0
+            for (const i in path) {
+                if (path[i] === '/') {
+                    count = count + 1
+                }
+                
+            }
+            
+            let paths = path.split('/')
+
+            if (count > 1) {
+                if(this.url) {
+                    let clone = []
+                    let url = this.url.slice(1, this.url.length)
+                    for (const i in paths) {
+                        if (url !== paths[i]) {
+    
+                            clone.push(paths[i])
+                        }
+                    }
+                    paths = clone
+                   
+                }
+
+                if (this[paths[1]]) {
+
+                    this.activated = this[paths[1]]
+
+                    for (let index = 1; index < paths.length; index++) {
+                        if (this.activated.idx) {
+                            this.activated.setId(paths[index + 1])
+                            break
+                        }
+                        this.activated = this.activated[paths[i]]
+                        i = i + 1
+                        
+                    }
+
+                    console.log(path)
+
+
+        
                     this.status = true
-                    // this.head = 200
-                    // if(this.paths[i].head) {
-                    //     this.head = this.paths[i].head  
-                    // }
-                    this.active = i
-    
-                } 
-                // else {
-                //     this.status = 404
-                //     this.head = 404
-                //     this.active = 404
-    
-                // }
+                } else {
+                    this.status = false
+                }
+            } else if (this[paths[0]]) {
+                this.activated = this[paths[0]]
+                this.status = true
+            } else {
+                this.status = false
             }
 
+
         }
+
+        if (loop) {
+            if (this.paths) {
+                for (const i in this.paths) {
+                    // console.log(this.paths[i].path, rqs.url)
+                    if(this.paths[i].path === path) {
+                        this.activated = this.paths[i]
+
+                        this.status = true
+                        // this.head = 200
+                        // if(this.paths[i].head) {
+                        //     this.head = this.paths[i].head  
+                        // }
+
+                    } 
+                    // else {
+                    //     this.status = 404
+                    //     this.head = 404
+                    //     this.active = 404
+        
+                    // }
+                }
+    
+            }
+        }
+
+        
         
 
 

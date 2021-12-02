@@ -7,7 +7,7 @@ class NjParser extends NjUrlSuper {
     constructor(dt, objx) {
         super(dt, objx)
         
-        if (this.type == 'web') {
+        if (this.jsDir) {
             this.htmlOpt = {
                 closedTag:'<TAG>CONTENT</TAG>',
                 bodyTag: '<body>CONTENT</body>',
@@ -29,8 +29,12 @@ class NjParser extends NjUrlSuper {
                 this.html.addLinkScripts('js', ['/jinload.js'])
             }
 
-            this.html.addLinkScripts('css', this.cssLinks)
-            this.html.addLinkScripts('js', this.jsScripts)
+            if (this.jsScripts) {
+                this.html.addLinkScripts('js', this.jsScripts)
+            } else if (this.cssLinks) {
+                this.html.addLinkScripts('css', this.cssLinks)
+            }
+
 
             this.defaultBody = '<h1>Body</h1>'
             this.html.replaceBody(this.defaultBody)

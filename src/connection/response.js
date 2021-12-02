@@ -25,16 +25,14 @@ class NjResponse extends NjSuper {
         return this.head(code, conext) + rsp
     }
 
-    async qualify(contmp) {
-        
-        if (contmp.status == true) {
-            if (contmp.paths[contmp.active].status == true) {
+    async qualify(url) {
+        if (url.status == true) {
+            if (url.activated) {
+                this.response = this.codeRes(200, this.ext, url.activated.rsp(this.request))
+                url.status = false
+                url.activated = false
+            } 
 
-                this.response = this.codeRes(200, this.ext, contmp.paths[contmp.active].rsp(this.request))
-                contmp.status = false
-                contmp.paths[contmp.active].status = false
-
-            }
         }
     }
 

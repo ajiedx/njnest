@@ -1,5 +1,6 @@
 const { NjResponse } = require('./response')
 const { NjFiles } = require('njfile')
+const { NjUrlResponse } = require('../url/response')
 
 class NjCheck extends NjResponse {
 
@@ -11,7 +12,6 @@ class NjCheck extends NjResponse {
         this.controller = new AbortController()
 
     }
-
 
     async rqs(data) {
         const [firstLine, ...otherLines] = data.toString().split('\n')
@@ -67,9 +67,15 @@ class NjCheck extends NjResponse {
             if (this.compareBegining('/jinload', path)) {
                 this.reloadFile = path.split('/')
                 this.reloadFile = this.reloadFile[2] + '/' + this.reloadFile[3]
+                this.response = '\r\n'
             } else {
                 this.controller.abort()
                 this.response = 'Aborted..\r\n'
+                for (const i in this.urls) {
+                    if(this.urls[i].sqlRequest) {
+                        this.urls[i].sqlRequest('', function () {})
+                    }
+                }
             }
         } else if (this.compareBegining('/jinload', path)) {
             if (this.compareBegining('/jinload.js', path)) {
@@ -112,7 +118,7 @@ class NjCheck extends NjResponse {
 
         for(const i in this.urls) {
 
-            if (this.urls[i].type === 'web') {
+            if (this.urls[i].jsDir) {
                 if (this.compareBegining('text/html', this.request.headers.Accept)) {
                     
                     this.ext = 'html'
@@ -125,8 +131,22 @@ class NjCheck extends NjResponse {
                 }
                 
                 this.urls[i].check(this.request.path)
-                this.qualify(this.urls[i]) 
-            } 
+                if (!this.urls[i].activated) {
+                    this.urls[i].check(this.request.path, true)
+                }
+
+                if (this.urls[i].activated instanceof NjUrlResponse) {
+                    this.qualify(this.urls[i]) 
+                } else {
+                    this.response = this.codeRes(400, this.ext, 'Not Found')
+                    this.urls[i].status = false
+                }
+            } else if (this.urls[i].sql) {
+                this.urls[i].check(this.request.path)
+                if (this.urls[i].activated instanceof NjUrlResponse) {
+                    this.response = this.codeRes(200, this.ext, this.urls[i].activated.rsp(this.request))
+                }
+            }
             
             
         }

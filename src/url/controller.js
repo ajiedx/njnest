@@ -7,10 +7,18 @@ class NjController extends NjSuper {
 
     }
 
-    crsp(rsp, req, res) {
-        this.ctrl = rsp({html: this.html}, req, res)
+    setId(id) {
+        this.idx = id
+    }
 
-        return this.ctrl.html.dt
+    crsp(rsp, req) {
+
+        if (this.html) {
+            return rsp(this, req).html.dt
+        } else if (this.sql) {
+            return rsp(this, req).exec()
+        }
+
     }
 }
 

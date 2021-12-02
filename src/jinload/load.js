@@ -132,12 +132,3 @@ jinLoadTarget.addEventListener('onjinload', function(jinEvent) {
         }
     }
 })
-
-document.onreadystatechange = function () {
-    if(document.readyState === 'complete') {
-        window.newJinLoadState = 'ready'
-
-        jinload.startReload()
-        jinload.js('jincss')
-    }
-}
