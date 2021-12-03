@@ -26,6 +26,7 @@ class NjResponse extends NjSuper {
     }
 
     async qualify(url) {
+
         if (url.status == true) {
             if (url.activated) {
                 this.response = this.codeRes(200, this.ext, url.activated.rsp(this.request))

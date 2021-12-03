@@ -29,8 +29,8 @@ class NjCheck extends NjResponse {
                 network,
                 headers,
             }
-        } 
-        
+        }
+
         // else if (this.compareBegining('LOCAL', network)) {
         //     console.log(data.toString())
         //     this.request = {
@@ -39,24 +39,24 @@ class NjCheck extends NjResponse {
         //         network
         //     }
         // }
-        
+
 
         // console.log(this.compareBegining('text/html', this.request.headers.Accept))
 
         // console.log(this.request )
         // console.log(ps['a-d&']['a-d'])
-       
+
 
     }
 
     async updateReload() {
         if (this.reloaded) {
-            this.response = this.codeRes(200, '*/*', 'Reload Browser')  
+            this.response = this.codeRes(200, '*/*', 'Reload Browser')
             this.reloaded = false
         } else if (this.reloadFile) {
-            this.response = this.codeRes(200, '*/*', this.reloadFile) 
+            this.response = this.codeRes(200, '*/*', this.reloadFile)
         } else {
-            this.response =  this.codeRes(200, '*/*', 'No Updates Found') 
+            this.response =  this.codeRes(200, '*/*', 'No Updates Found')
         }
     }
 
@@ -74,6 +74,7 @@ class NjCheck extends NjResponse {
                 for (const i in this.urls) {
                     if(this.urls[i].sqlRequest) {
                         this.urls[i].sqlRequest('', function () {})
+
                     }
                 }
             }
@@ -95,7 +96,7 @@ class NjCheck extends NjResponse {
                                         this.urls[i][file[1]][l][file[0]].toString()
                                         this.response = this.codeRes(200, file[1],
                                             this.urls[i][file[1]][l][file[0]].content)
-                                    
+
                                     }
                                 }
                             }
@@ -107,7 +108,7 @@ class NjCheck extends NjResponse {
             }
 
 
-            
+
         } else {
             this.check(data)
         }
@@ -120,43 +121,48 @@ class NjCheck extends NjResponse {
 
             if (this.urls[i].jsDir) {
                 if (this.compareBegining('text/html', this.request.headers.Accept)) {
-                    
+
                     this.ext = 'html'
 
                 } else if (this.compareBegining('text/js', this.request.headers.Accept)) {
-                    
+
                     this.ext = 'js'
                 } else if (this.compareBegining('text/css', this.request.headers.Accept)) {
                     this.ext = 'css'
                 }
-                
+
                 this.urls[i].check(this.request.path)
                 if (!this.urls[i].activated) {
                     this.urls[i].check(this.request.path, true)
                 }
 
                 if (this.urls[i].activated instanceof NjUrlResponse) {
-                    this.qualify(this.urls[i]) 
+                    this.qualify(this.urls[i])
                 } else {
                     this.response = this.codeRes(400, this.ext, 'Not Found')
                     this.urls[i].status = false
                 }
             } else if (this.urls[i].sql) {
-                this.urls[i].check(this.request.path)
-                if (this.urls[i].activated instanceof NjUrlResponse) {
-                    this.response = this.codeRes(200, this.ext, this.urls[i].activated.rsp(this.request))
+                
+                if (!this.compareBegining('image', this.request.headers.Accept)) {
+                    this.urls[i].check(this.request.path)
+                    if (this.urls[i].activated instanceof NjUrlResponse) {
+
+                        this.response = this.codeRes(200, this.ext, this.urls[i].activated.rsp(this.request))
+                    }
                 }
+
             }
-            
-            
+
+
         }
 
-        
+
         // else {
         //     for(const i in this.urls) {
         //         if (this.urls[i].type !== 'web') {
         //             this.urls[i].check(this.request.path)
-        //             this.qualify(this.urls[i]) 
+        //             this.qualify(this.urls[i])
         //         }
         //     }
         // }

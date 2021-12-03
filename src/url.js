@@ -101,7 +101,7 @@ class NjUrl extends NjParser {
             }
             
             if (this.sql) {
-                opt.sql = this.sql
+                opt.sql = this.sql.copy(this.sql)
                 opt.sqlName = this.sqlName
                 if(this.sqlRequest) {
                     opt.sqlRequest = this.sqlRequest
@@ -158,7 +158,7 @@ class NjUrl extends NjParser {
                         }
                     }
                     paths = clone
-                   
+
                 }
 
                 if (this[paths[1]]) {
@@ -183,8 +183,8 @@ class NjUrl extends NjParser {
                 } else {
                     this.status = false
                 }
-            } else if (this[paths[0]]) {
-                this.activated = this[paths[0]]
+            } else if (this[paths[1]]) {
+                this.activated = this[paths[1]]
                 this.status = true
             } else {
                 this.status = false

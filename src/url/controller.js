@@ -16,7 +16,7 @@ class NjController extends NjSuper {
         if (this.html) {
             return rsp(this, req).html.dt
         } else if (this.sql) {
-            return rsp(this, req).exec()
+            return rsp(this, req).exec(req)
         }
 
     }
