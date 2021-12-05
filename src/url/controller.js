@@ -6,7 +6,7 @@ class NjController extends NjSuper {
         super(dt, objx)
 
     }
-
+    
     setId(id) {
         this.idx = id
     }
