@@ -79,7 +79,7 @@ class NjCheck extends NjResponse {
                 }
             }
         } else if (this.compareBegining('/jinload', path)) {
-            if (this.compareBegining('/jinload.js', path)) {
+            if ('/jinload.js' === path) {
                 this.check(data)
             } else {
                 const jinload = path.split('/')
@@ -94,9 +94,8 @@ class NjCheck extends NjResponse {
                                     if (this.urls[i][file[1]][l][file[0]]) {
                                         this.urls[i][file[1]][l][file[0]].updateFile()
                                         this.urls[i][file[1]][l][file[0]].toString()
-                                        this.response = this.codeRes(200, file[1],
-                                            this.urls[i][file[1]][l][file[0]].content)
-
+                                        this.ext = file[1]
+                                         this.load(this.urls[i][file[1]][l][file[0]].content)
                                     }
                                 }
                             }
@@ -125,7 +124,7 @@ class NjCheck extends NjResponse {
                     this.ext = 'html'
 
                 } else if (this.compareBegining('text/js', this.request.headers.Accept)) {
-
+                    
                     this.ext = 'js'
                 } else if (this.compareBegining('text/css', this.request.headers.Accept)) {
                     this.ext = 'css'

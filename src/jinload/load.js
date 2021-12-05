@@ -1,9 +1,13 @@
+
+
 class JinLoad extends NjSuper {
     super(dt, objx) {
         this.ext = ''
         this.path = ''
         this.files = {}
     }
+
+
 
     js(name, state) {
 
@@ -16,29 +20,51 @@ class JinLoad extends NjSuper {
             window.newJinLoadState = state
         }
 
-        if (window.xhr) {
-            window.xhr.open('GET', '/jinload/' + name + '.js', true)
+        let perspective = 'GET'
 
-            window.xhr.onload = function () {
+        if (state === 'update') {
+            perspective = 'PUT'
+        }
+        
+        let path
+        if (name.includes('.js')) {
+            path = '/jinload/' + name 
+
+        } else {
+            path = '/jinload/' + name + '.js'
+        }
+        
+        fetch(path, {
+            method: perspective, 
+            headers: {
+            // 'Content-Type': 'text/javascript',
+            },
+            // body: JSON.stringify(data),
+        })
+        .then(response => {
+            console.log()
+            // response.blob()
+            response.text().then(function(text) {
 
                 if (state) {
                     if (state == 'update') {
                         console.log('*****************        '+name+'.js        *****************')
                     }
-                    eval(xhr.response)
+                    eval(text)
                     if (window.jinLoadTarget) {
                         window.jinLoadTarget(window.jinLoadEvent)
                     }
                 } else {
-                    eval(xhr.response)
+                    eval(text)
                 }
-
-                window.xhr.abort()
-            }
-            
-            window.xhr.send()
-        }
-
+            })
+        })
+        // .then(data => {
+        //     console.log('Success:', data)
+        // })
+        .catch((error) => {
+            console.error('Error:', error)
+        })
     }
 
     css(name, state) {
@@ -46,38 +72,45 @@ class JinLoad extends NjSuper {
             window.newJinLoadState = state
         }
 
-        if (window.xhr) {
-            window.xhr.open('GET', '/jinload', true)
-            window.xhr.setRequestHeader('jinload', name)
-            window.xhr.setRequestHeader('extension', 'css')
+        let perspective = 'GET'
 
-            window.xhr.onload = function () {
+        if (state === 'update') {
+            perspective = 'PUT'
+        }
     
-                
+        fetch('/jinload/' + name + '.css', {
+            method: perspective, // or 'PUT'
+            headers: {
+            // 'Content-Type': 'text/javascript',
+            },
+            // body: JSON.stringify(data),
+        })
+        .then(response => {
+            console.log()
+            // response.blob()
+            response.text().then(function(text) {
+
                 if (state) {
                     if (state == 'update') {
-                        if (window.jincss) {
-                            window.jincss.load(xhr.reponse)
-                        }
+                        console.log('*****************        '+name+'.css       *****************')
                     }
-                    
+
+                    if (window.jincss) {
+                        window.jincss.load(text)
+                    } 
                     if (window.jinLoadTarget) {
                         window.jinLoadTarget(window.jinLoadEvent)
                     }
-                }
-
-                if (window.jincss) {
-                    window.jincss.load(xhr.reponse)
                 } else {
-                    console.log('error css')
-                }
+                    if (window.jincss) {
+                        window.jincss.load(text)
+                    } 
 
-    
-                window.xhr.abort()
-            }
-            
-            window.xhr.send()
-        }
+                }
+            })
+        })
+
+        
     }
     startReload() {
         window

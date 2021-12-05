@@ -39,16 +39,17 @@ class NjUrlSuper extends NjSuper {
             this.njfile.defineFile('jinupdate', {path: this.njnestdir + update, url: '/jinupdate.js', string: true})
 
 
-            this.njfile.jinload.content = this.njfile.njsuper.content + this.njfile.jinload.content
+            this.njfile.jinload.content = this.njfile.njsuper.content + this.njfile.jincss.content + this.njfile.jinload.content
             this.njfile.jinupdate.content = this.njfile.njsuper.content + this.njfile.jinupdate.content
+            delete this.jincss
             delete this.njfile.njsuper
             
             let jsloads = ["document.onreadystatechange = function () { \r\n \
                 if(document.readyState === 'complete') {\r\n \
                 window.newJinLoadState = 'ready' \r\n \
         \
-                jinload.startReload() \r\n \
-                jinload.js('jincss') \r\n"]
+                jinload.startReload() \r\n "]
+                // jinload.js('jincss.js') \r\n"]
             if (this.jinload) {
                 
                 for (const i in this.jinload) {
