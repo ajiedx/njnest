@@ -56,7 +56,7 @@ Keep-Alive: timeout=5, max=1000 \r\n\
         if (this.ext === 'css') {
             this.response = this.codeRes(200, '*/*', this.jinload.css(text))
         } else {
-            this.response = this.codeRes(200, '*/*', text)
+            this.response = this.codeRes(200, '*/*', text.content)
         }
     }
 

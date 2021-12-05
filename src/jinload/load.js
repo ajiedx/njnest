@@ -5,6 +5,7 @@ class JinLoad extends NjSuper {
         this.ext = ''
         this.path = ''
         this.files = {}
+        this.styles = {}
     }
 
 
@@ -96,14 +97,14 @@ class JinLoad extends NjSuper {
                     }
 
                     if (window.jincss) {
-                        window.jincss.load(text)
+                        window.jincss.load(name, text)
                     } 
                     if (window.jinLoadTarget) {
                         window.jinLoadTarget(window.jinLoadEvent)
                     }
                 } else {
                     if (window.jincss) {
-                        window.jincss.load(text)
+                        window.jincss.load(name, text)
                     } 
 
                 }
@@ -112,6 +113,7 @@ class JinLoad extends NjSuper {
 
         
     }
+
     startReload() {
         window
         if (window.Worker) {
@@ -129,6 +131,8 @@ class JinLoad extends NjSuper {
                         console.log(this.reloadFileName)
                         if (this.reloadExt === 'js') {
                             window.jinload.js(this.reloadFileName, 'update')
+                        } else if (this.reloadExt === 'css') {
+                            window.jinload.css(this.reloadFileName, 'update')
                         }
                         
                     }

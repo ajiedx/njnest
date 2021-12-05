@@ -31,8 +31,7 @@ const webapp = new NjUrl('bane', {
   htmlMeta,
   jinload: ['main.js'],
   jsDir: ['./src'],
-  cssDir: ['./src/css'],
-  cssLinks: ['./src/css/main.css'],
+  cssDir: ['./src/css']
 })
 
 

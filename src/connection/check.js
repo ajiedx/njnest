@@ -95,7 +95,7 @@ class NjCheck extends NjResponse {
                                         this.urls[i][file[1]][l][file[0]].updateFile()
                                         this.urls[i][file[1]][l][file[0]].toString()
                                         this.ext = file[1]
-                                         this.load(this.urls[i][file[1]][l][file[0]].content)
+                                         this.load(this.urls[i][file[1]][l][file[0]])
                                     }
                                 }
                             }

@@ -1,0 +1,8 @@
+body {
+    background-color: red;   
+}
+
+.bd, #something {
+    background-color: black;
+    cursor: pointer;     
+}

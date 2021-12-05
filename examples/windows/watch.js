@@ -1,7 +1,7 @@
 const { NjNest } = require('../../njnest')
 
 const njreload = {
-    front: { dirs: ['./src'], ext: ['js'],
+    front: { dirs: ['./src'], ext: ['js', 'css'],
     reloader: 'jinreload'
   }, 
     back: { 

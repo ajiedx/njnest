@@ -1,20 +1,80 @@
+class JinStyle {
+  constructor() {
+    const style = document.createElement('style')
+    document.head.appendChild(style)
+    
+    this.style = style.sheet
+
+    this.css = {}
+    this.incss = {}
+  }
+
+  
+  indexify(i, index, prop) {
+    let line = ''
+    let value = ''
+    for (const l in i) {
+      if (i[l] === '{') {
+        this[prop][index] = {name: line.trim()}
+        line = ''
+      } else if (i[l] === ':') {  
+        value = line.trim()
+        line = ''
+      } else if (i[l] === ';') {  
+        Object.assign(this[prop][index], {[value]: line.trim()})
+        line = ''
+      } else {
+        line = line + i[l]
+      }
+    }
+  }
+
+  load(file) {
+    
+    console.log(file)
+    let json = JSON.parse(file)
+    if (this.style.cssRules.length == 0) {
+      for (const i in json) {
+        this.style.insertRule(i, json[i])
+        this.indexify(i, json[i], 'css')
+
+      }
+    } else {
+      for (const i in json) {
+        this.indexify(i, json[i], 'incss')
+      }
+      for (const i in this.incss) {
+        for (const l in this.incss[i]) {
+          if (l !== 'name') {
+            this.style.cssRules[i].styleMap.set(l, this.incss[i][l])
+          }
+        }
+      }
+    }
+  }
+
+}
+
 class JinCss extends NjSuper {
     constructor(dt, objx) {
         super(dt, objx)
-        const style = document.createElement('style')
-        document.head.appendChild(style)
-        
-        this.style = style.sheet
-        console.dir(this.style)
-        // this.style.insertRule('body { background-color: black }', 0)
-        
-        // this.json = '{"0": { "body": "{ background-color: black }" }}'
+        this.styles = {}
+
     }
 
-    load(file) {
-        console.log(file)
+    load(name, file) {
+      if (this.styles[name]) {
+        console.log(name)
+        this.styles[name].load(file)
+      } else {
+        this.styles[name] = new JinStyle()
+        this.styles[name].load(file)
+      }
+
+
     }
 }
+
 // let stylesheet = new CSSStyleDeclaration()
 // console.log(stylesheet)
 

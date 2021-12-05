@@ -3,7 +3,7 @@ const reqUpdate = (host, timer) => {
     setTimeout(function() {requestUpdate(host)}, timer)
 }
 
-function responseUpdate(res, host) {
+function responseUpdate(res, host , mlsec) {
     if (res) {
         if(self.update == undefined) {
             Object.defineProperty(self, 'update', {
@@ -13,12 +13,12 @@ function responseUpdate(res, host) {
                 configurable: true
               })
             
-              reqUpdate(host, 3000)
+              reqUpdate(host, mlsec)
         } else if (self.update == res) {
-            reqUpdate(host, 3000)
+            reqUpdate(host, mlsec)
         } else {
 
-            reqUpdate(host, 3000)
+            reqUpdate(host, mlsec)
 
             self.postMessage(res)
             self.update = res
@@ -42,7 +42,7 @@ function requestUpdate(host) {
     .then(response => {
 
         response.text().then(function(text) {
-            responseUpdate(text, host)
+            responseUpdate(text, host, 500)
 
         })
         
