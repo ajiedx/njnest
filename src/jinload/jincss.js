@@ -53,9 +53,14 @@ class JinCss extends NjSuper {
                     cindex = cindex + 3
                 }
             }
-            console.log(this.incss)
-            this.recss = this.loadcss
-            this.json(this.incss)
+            if(this.incss[0] == undefined) {
+                this.json(this.loadcss)
+            } else {
+                this.recss = this.loadcss
+                
+                this.json(this.incss)
+            }
+
         } else {
             this.recss = []
             let re = 1

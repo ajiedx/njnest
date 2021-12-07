@@ -1,6 +1,7 @@
 const { NjResponse } = require('./response')
 const { NjFiles } = require('njfile')
 const { NjUrlResponse } = require('../url/response')
+const { NjView } = require('../nest/views')
 
 class NjCheck extends NjResponse {
 
@@ -30,23 +31,12 @@ class NjCheck extends NjResponse {
                 headers,
             }
         }
-
-        // else if (this.compareBegining('LOCAL', network)) {
-        //     console.log(data.toString())
-        //     this.request = {
-        //         perspective,
-        //         path,
-        //         network
+        // if (!this.compareBegining('image', this.request.headers.Accept)) {
+        //     if (!path.includes('js') || !path.includes('css')) {
+        //         console.log('\x1b[33m%s\x1b[0m', this.request)
+        //         console.log('\x1b[34m%s\x1b[0m', this.request.headers)
         //     }
         // }
-
-
-        // console.log(this.compareBegining('text/html', this.request.headers.Accept))
-
-        // console.log(this.request )
-        // console.log(ps['a-d&']['a-d'])
-
-
     }
 
     async updateReload() {
@@ -95,7 +85,7 @@ class NjCheck extends NjResponse {
                                         this.urls[i][file[1]][l][file[0]].updateFile()
                                         this.urls[i][file[1]][l][file[0]].toString()
                                         this.ext = file[1]
-                                         this.load(this.urls[i][file[1]][l][file[0]])
+                                        this.load(this.urls[i][file[1]][l][file[0]])
                                     }
                                 }
                             }
@@ -130,13 +120,19 @@ class NjCheck extends NjResponse {
                     this.ext = 'css'
                 }
 
-                this.urls[i].check(this.request.path)
+                this.urls[i].check(this.request)
                 if (!this.urls[i].activated) {
-                    this.urls[i].check(this.request.path, true)
+                    this.urls[i].check(this.request, true)
                 }
-
+                
                 if (this.urls[i].activated instanceof NjUrlResponse) {
                     this.qualify(this.urls[i])
+                } else if (this.urls[i].activated instanceof NjView) {
+                    console.log(this.urls[i].activated)
+                    this.ext = 'html'
+                    this.response = this.codeRes(200, this.ext, this.urls[i].activated.rsp(this.request))
+                    console.log(this.response)
+                    this.urls[i].status = false
                 } else {
                     this.response = this.codeRes(400, this.ext, 'Not Found')
                     this.urls[i].status = false
@@ -144,7 +140,7 @@ class NjCheck extends NjResponse {
             } else if (this.urls[i].sql) {
                 
                 if (!this.compareBegining('image', this.request.headers.Accept)) {
-                    this.urls[i].check(this.request.path)
+                    this.urls[i].check(this.request)
                     if (this.urls[i].activated instanceof NjUrlResponse) {
 
                         this.response = this.codeRes(200, this.ext, this.urls[i].activated.rsp(this.request))

@@ -1,10 +1,21 @@
 const { NjSuper } = require('njsuper')
-
+const { NjViews } = require('../nest/views')
 
 class NjController extends NjSuper {
     constructor(dt, objx) {
         super(dt, objx)
 
+        if (objx.views) {
+            this.views = new NjViews('', {views: this.views, parent: this.name, construct: true})
+            if (objx.VIEWS) {
+                this.views.append(this.VIEWS)
+            }
+        } else if (objx.VIEWS) {
+            this.views = new NjViews('', {views: this.VIEWS, parent: this.name, construct: true})
+        }
+
+
+        
     }
     
     setId(id) {

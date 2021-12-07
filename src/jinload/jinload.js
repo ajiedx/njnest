@@ -7,8 +7,6 @@ class JinLoad extends NjSuper {
 
     }
 
-    
-
     css (file) {
         if (this[file.name]) {
             this[file.name].indexifyCss(file.content)

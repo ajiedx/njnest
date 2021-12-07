@@ -1,8 +1,8 @@
 class JinStyle {
-  constructor() {
+  constructor(name) {
     const style = document.createElement('style')
     document.head.appendChild(style)
-    
+    style.setAttribute('jinstyle', name)
     this.style = style.sheet
 
     this.css = {}
@@ -30,8 +30,6 @@ class JinStyle {
   }
 
   load(file) {
-    
-    console.log(file)
     let json = JSON.parse(file)
     if (this.style.cssRules.length == 0) {
       for (const i in json) {
@@ -40,6 +38,7 @@ class JinStyle {
 
       }
     } else {
+      console.log(file)
       for (const i in json) {
         this.indexify(i, json[i], 'incss')
       }
@@ -58,16 +57,18 @@ class JinStyle {
 class JinCss extends NjSuper {
     constructor(dt, objx) {
         super(dt, objx)
+        
         this.styles = {}
 
     }
 
     load(name, file) {
-      if (this.styles[name]) {
-        console.log(name)
+
+      if (!this.styles[name]) {
+        this.styles[name] = new JinStyle(name)
         this.styles[name].load(file)
+
       } else {
-        this.styles[name] = new JinStyle()
         this.styles[name].load(file)
       }
 

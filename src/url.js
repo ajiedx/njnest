@@ -1,6 +1,6 @@
 const { NjUrlResponse } = require('./url/response')
 const { NjParser } = require('./parse')
-
+const { NjViews } = require('./nest/views')
 const { NjFiles, NjFile } = require('njfile')
 
 class NjUrl extends NjParser {
@@ -17,7 +17,7 @@ class NjUrl extends NjParser {
 
         }
 
-        
+
     }
 
     onScriptsLinks() {
@@ -85,6 +85,7 @@ class NjUrl extends NjParser {
             } })
         } else {
             let url
+            
             if (this.url) {
                 url = {path: this.url + path}
             } else {
@@ -125,6 +126,9 @@ class NjUrl extends NjParser {
             }
             if (opt.name) {
                 Object.assign(url, {pathid: length})
+                if (path === '/') {
+                    Object.assign(this.paths, { index: opt.name })
+                }
                 this[opt.name] = this.resolveObject(opt.name, url)
             }
 
@@ -134,18 +138,17 @@ class NjUrl extends NjParser {
     }
 
 
-    check(path, loop) {
+    check(req, loop) {
 
-        if(path.includes('/')) {
+        if(req.path.includes('/')) {
             let count = 0
-            for (const i in path) {
-                if (path[i] === '/') {
+            for (const i in req.path) {
+                if (req.path[i] === '/') {
                     count = count + 1
                 }
-                
             }
-            
-            let paths = path.split('/')
+
+            let paths = req.path.split('/')
 
             if (count > 1) {
                 if(this.url) {
@@ -176,9 +179,6 @@ class NjUrl extends NjParser {
                     }
 
                     console.log(path)
-
-
-        
                     this.status = true
                 } else {
                     this.status = false
@@ -186,6 +186,30 @@ class NjUrl extends NjParser {
             } else if (this[paths[1]]) {
                 this.activated = this[paths[1]]
                 this.status = true
+            } else if (req.path === '/') {
+                this.activated = this[this.paths.index]
+                this.status = true
+            } else if (this.paths.index) {
+                if (this[this.paths.index].views) {
+                    
+                    if (this[this.paths.index].controller) {
+                        if (this[this.paths.index].controller.views[paths[1]]) {
+                            // console.log(this[this.paths.index].controller.views[paths[1]], paths[1])
+                            this.activated = this[this.paths.index].controller.views[paths[1]]
+                            this.status = true
+                        } else {
+                            for (const i in this[this.paths.index].controller.views) {
+                                if (this[this.paths.index].controller.views[i] instanceof NjViews) {
+                                    if (this[this.paths.index].controller.views[i][paths[1]]) {
+                                        this.activated = this[this.paths.index].controller.views[i][paths[1]]
+                                        this.status = true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                  
+                }
             } else {
                 this.status = false
             }
@@ -197,7 +221,7 @@ class NjUrl extends NjParser {
             if (this.paths) {
                 for (const i in this.paths) {
                     // console.log(this.paths[i].path, rqs.url)
-                    if(this.paths[i].path === path) {
+                    if(this.paths[i].path === req.path) {
                         this.activated = this.paths[i]
 
                         this.status = true

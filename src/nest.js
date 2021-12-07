@@ -1,6 +1,7 @@
 const { NjConnection } = require('./connection')
 const { NjController } = require('./url/controller')
 const { NjUrl } = require('./url')
+const { NjViews } = require('./nest/views')
 const { NjWatcher } = require('./nest/watcher')
 const { NjReload } = require('njreload')
 const { NjSuper } = require('njsuper')
@@ -57,4 +58,4 @@ class NjNest extends NjSuper {
     }
 }
 
-module.exports = { NjNest, NjConnection, NjUrl, NjParser, NjController }
+module.exports = { NjNest, NjConnection, NjUrl, NjParser, NjController, NjViews }
