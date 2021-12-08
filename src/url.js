@@ -6,7 +6,7 @@ const { NjFiles, NjFile } = require('njfile')
 class NjUrl extends NjParser {
     constructor(dt, objx, t) {
         super(dt, objx, t)
-        this.objx = NjUrlResponse;
+        this.objx = NjUrlResponse
         this.paths = {}
         this.active = 0
         this.status = false
@@ -67,87 +67,53 @@ class NjUrl extends NjParser {
     }
 
 
-    on(path, opt) {
-        if (!opt.name) {
-            opt.name = path.split('/')
-            opt.name = opt.name[opt.name.length - 1]
-            if(opt.name.includes('.')) {
-                opt.name = opt.name.split('.')[0]
-            }
-            
+    on(path, options) {
+        if (!options.name) {
+            options.name = path.split('/')
+            options.name = options.name[options.name.length - 1]
+            if(options.name.includes('.')) options.name = options.name.split('.')[0]
         }
 
+        let url
+        if (this.url) url = {path: this.url + path}
+        else url = {path}
 
-        if(opt instanceof NjUrlResponse) {
-            this[opt.name] = this.resolveObject(opt.name, opt)
-            Object.assign(this.paths, { [opt.id]: {
-                path: opt.path
-            } })
-        } else {
-            let url
-            
-            if (this.url) {
-                url = {path: this.url + path}
-            } else {
-                url = {path}
-            }
+        if (this.jsDir) options.html = this.html
+        if (options.idx) options.id = options.idx
 
+        if (this.sql) {
+            options.sql = this.sql.copy(this.sql)
+            options.sqlName = this.sqlName
+            if(this.sqlRequest) options.sqlRequest = this.sqlRequest
+            else console.log('Provide SQL Request connection function for ' + this.sqlName + ' syntax.')
+        }
+        Object.assign(url, options)
 
-            if (this.jsDir) {
-                opt.html = this.html
-            }
-
-            if (opt.idx) {
-                opt.id = opt.idx
-            }
-            
-            if (this.sql) {
-                opt.sql = this.sql.copy(this.sql)
-                opt.sqlName = this.sqlName
-                if(this.sqlRequest) {
-                    opt.sqlRequest = this.sqlRequest
-                } else {
-                    console.log('Provide SQL Request connection function for ' + this.sqlName + ' syntax.')
-                }
-            }
-
-            
-
-            Object.assign(url, opt)
-
+        if (path.includes('.')) { // REGEX
             let length = 0
-
-            if (!url.length) {
-                for (const i in this.paths) {
-                    length = length + 1
-                }
-            } else {
-                length = url.length
-            }
-            if (opt.name) {
-                Object.assign(url, {pathid: length})
-                if (path === '/') {
-                    Object.assign(this.paths, { index: opt.name })
-                }
-                this[opt.name] = this.resolveObject(opt.name, url)
-            }
-
-            Object.assign(this.paths, { [length]: this[opt.name] })
-
-        }
+            for (const i in this.paths) 
+                length = length + 1
+            let symbolpath = this.resolveObject(path, url)
+            Object.assign(this.paths, { [length]: symbolpath })
+        } else if (options.name) {
+            if (path === '/') this.__INDEX = options.name
+            this[options.name] = this.resolveObject(options.name, url)
+        } 
     }
 
+    noImageScriptsWorkersDocs(value) {
+        const no = ['script', 'worker', 'image', 'document']
+        for (const i in no) {
+            if (this.compareBegining(no[i], value)) return false
+        }
+
+        return true
+    }
 
     check(req, loop) {
 
         if(req.path.includes('/')) {
-            let count = 0
-            for (const i in req.path) {
-                if (req.path[i] === '/') {
-                    count = count + 1
-                }
-            }
-
+            let count = this.countChars(req.path, '/')
             let paths = req.path.split('/')
 
             if (count > 1) {
@@ -155,19 +121,13 @@ class NjUrl extends NjParser {
                     let clone = []
                     let url = this.url.slice(1, this.url.length)
                     for (const i in paths) {
-                        if (url !== paths[i]) {
-    
-                            clone.push(paths[i])
-                        }
+                        url !== paths[i] && clone.push(paths[i])
                     }
                     paths = clone
-
                 }
 
                 if (this[paths[1]]) {
-
                     this.activated = this[paths[1]]
-
                     for (let index = 1; index < paths.length; index++) {
                         if (this.activated.idx) {
                             this.activated.setId(paths[index + 1])
@@ -175,10 +135,7 @@ class NjUrl extends NjParser {
                         }
                         this.activated = this.activated[paths[i]]
                         i = i + 1
-                        
                     }
-
-                    console.log(path)
                     this.status = true
                 } else {
                     this.status = false
@@ -187,28 +144,24 @@ class NjUrl extends NjParser {
                 this.activated = this[paths[1]]
                 this.status = true
             } else if (req.path === '/') {
-                this.activated = this[this.paths.index]
+                this.activated = this[this.__INDEX] ? this[this.__INDEX] : false
                 this.status = true
-            } else if (this.paths.index) {
-                if (this[this.paths.index].views) {
-                    
-                    if (this[this.paths.index].controller) {
-                        if (this[this.paths.index].controller.views[paths[1]]) {
-                            // console.log(this[this.paths.index].controller.views[paths[1]], paths[1])
-                            this.activated = this[this.paths.index].controller.views[paths[1]]
-                            this.status = true
-                        } else {
-                            for (const i in this[this.paths.index].controller.views) {
-                                if (this[this.paths.index].controller.views[i] instanceof NjViews) {
-                                    if (this[this.paths.index].controller.views[i][paths[1]]) {
-                                        this.activated = this[this.paths.index].controller.views[i][paths[1]]
-                                        this.status = true
-                                    }
+            } else if (this.noImageScriptsWorkersDocs(req.headers['Sec-Fetch-Dest']) && this.__INDEX) {
+                if (this[this.__INDEX].controller) {
+                    if (this[this.__INDEX].controller.views[paths[1]]) {
+                        console.log(req)
+                        this.activated = this[this.__INDEX].controller.views[paths[1]]
+                        this.status = true
+                    } else {
+                        for (const i in this[this.__INDEX].controller.views) {
+                            if (this[this.__INDEX].controller.views[i] instanceof NjViews) {
+                                if (this[this.__INDEX].controller.views[i][paths[1]]) {
+                                    this.activated = this[this.paths.s__INDEX].controller.views[i][paths[1]]
+                                    this.status = true
                                 }
                             }
                         }
                     }
-                  
                 }
             } else {
                 this.status = false
