@@ -7,9 +7,9 @@ class NjView extends NjSuper {
     }
 
     rsp (req) {
-        console.log('hello')
+        
         if (this.response) {
-            this.response(this, req)
+            return this.response(this, req)
         } else if (this.html) {
             return this.html
         }

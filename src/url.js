@@ -1,6 +1,6 @@
 const { NjUrlResponse } = require('./url/response')
 const { NjParser } = require('./parse')
-const { NjViews } = require('./nest/views')
+
 const { NjFiles, NjFile } = require('njfile')
 
 class NjUrl extends NjParser {
@@ -17,6 +17,7 @@ class NjUrl extends NjParser {
 
         }
 
+        this.noImageScriptsWorkersDocs = ['script', 'worker', 'image', 'document']
 
     }
 
@@ -101,15 +102,6 @@ class NjUrl extends NjParser {
         } 
     }
 
-    noImageScriptsWorkersDocs(value) {
-        const no = ['script', 'worker', 'image', 'document']
-        for (const i in no) {
-            if (this.compareBegining(no[i], value)) return false
-        }
-
-        return true
-    }
-
     check(req, loop) {
 
         if(req.path.includes('/')) {
@@ -118,51 +110,44 @@ class NjUrl extends NjParser {
 
             if (count > 1) {
                 if(this.url) {
-                    let clone = []
                     let url = this.url.slice(1, this.url.length)
-                    for (const i in paths) {
-                        url !== paths[i] && clone.push(paths[i])
-                    }
-                    paths = clone
+                    paths = paths.filter(path => url !== path)
                 }
 
-                if (this[paths[1]]) {
-                    this.activated = this[paths[1]]
-                    for (let index = 1; index < paths.length; index++) {
-                        if (this.activated.idx) {
-                            this.activated.setId(paths[index + 1])
+                for (let i = 1; i < paths.length; i++) {
+                    if (this[paths[i]]) {
+                        if (this[paths[i]].idx) {
+                            this.activated = this[paths[i]]
+                            this.activated.setId(paths[i + 1])
                             break
+                        } else if (this[paths[i]].views) {
+                            if (!this.valueInArray(req.headers['Sec-Fetch-Dest'], this.noImageScriptsWorkersDocs)) {
+                                this.activated = this[paths[i]]
+                                this.activated = this.activated.activateView(paths[i])
+                                break
+                            }
                         }
-                        this.activated = this.activated[paths[i]]
-                        i = i + 1
-                    }
-                    this.status = true
-                } else {
-                    this.status = false
+                    } 
                 }
+
+                if (this.activated) this.status = true
+                else this.status = false
+                
             } else if (this[paths[1]]) {
                 this.activated = this[paths[1]]
                 this.status = true
             } else if (req.path === '/') {
                 this.activated = this[this.__INDEX] ? this[this.__INDEX] : false
                 this.status = true
-            } else if (this.noImageScriptsWorkersDocs(req.headers['Sec-Fetch-Dest']) && this.__INDEX) {
-                if (this[this.__INDEX].controller) {
-                    if (this[this.__INDEX].controller.views[paths[1]]) {
-                        console.log(req)
-                        this.activated = this[this.__INDEX].controller.views[paths[1]]
-                        this.status = true
-                    } else {
-                        for (const i in this[this.__INDEX].controller.views) {
-                            if (this[this.__INDEX].controller.views[i] instanceof NjViews) {
-                                if (this[this.__INDEX].controller.views[i][paths[1]]) {
-                                    this.activated = this[this.paths.s__INDEX].controller.views[i][paths[1]]
-                                    this.status = true
-                                }
-                            }
-                        }
-                    }
+            } else if (!this.valueInArray(req.headers['Sec-Fetch-Dest'], this.noImageScriptsWorkersDocs) && this.__INDEX) {
+                if (this[this.__INDEX].views) {
+                    console.log('\x1b[33m%s\x1b[0m', req)
+                    console.log('\x1b[34m%s\x1b[0m', req)
+                    this.activated = this[this.__INDEX].activateView(paths[1])
+                    if (this.activated) this.status = true
+                    else this.status = false
                 }
+
             } else {
                 this.status = false
             }

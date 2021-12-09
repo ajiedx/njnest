@@ -1,6 +1,6 @@
 
 const { NjSuper } = require('njsuper')
-
+const { NjViews } = require('../nest/views')
 const { NjController } = require('./controller')
 
 class NjUrlResponse extends NjSuper {
@@ -39,6 +39,25 @@ class NjUrlResponse extends NjSuper {
 
     setId(id) {
         this.controller.setId(id)
+    }
+
+    activateView(view) {
+        if (this.controller) {
+            if (this.controller.views[view]) {
+                return this.controller.views[view]
+            } else {
+                for (const i in this.controller.views) {
+                    if (this.controller.views[i] instanceof NjViews) {
+                        if (this.controller.views[i][view]) {
+                            return this.controller.views[i][view]
+                        } 
+                    }
+                }
+            }
+        }
+        
+        return false
+
     }
 
     rsp(req) {

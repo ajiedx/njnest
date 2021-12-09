@@ -128,11 +128,10 @@ class NjCheck extends NjResponse {
                 if (this.urls[i].activated instanceof NjUrlResponse) {
                     this.qualify(this.urls[i])
                 } else if (this.urls[i].activated instanceof NjView) {
-                    console.log(this.urls[i].activated)
-                    this.ext = 'html'
-                    this.response = this.codeRes(200, this.ext, this.urls[i].activated.rsp(this.request))
+                    // console.log(this.urls[i].activated, '_____')
+                    this.ext = '*/*'
+                    this.qualify(this.urls[i])
                     console.log(this.response)
-                    this.urls[i].status = false
                 } else {
                     this.response = this.codeRes(400, this.ext, 'Not Found')
                     this.urls[i].status = false

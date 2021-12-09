@@ -1,12 +1,12 @@
 
 const { NjSuper } = require('njsuper')
-const { JinLoad } = require('../jinload/jinload')
+const { JinLoads } = require('../jinload/jinload')
 
 class NjResponse extends NjSuper {
     constructor(dt, objx) {
         super(dt, objx)
         this.unicode = 'charset=utf-8'
-        this.jinload = new JinLoad()
+        this.jinload = new JinLoads()
     }
 
     head(code, contype) {
@@ -64,9 +64,7 @@ Keep-Alive: timeout=5, max=1000 \r\n\
 
         if (url.status == true) {
             if (url.activated) {
-                if (url.activated.headers) {
-                    this.assign('this', url.activated.headers)
-                }
+                if (url.activated.headers) this.assign('this', url.activated.headers)
 
                 this.response = this.codeRes(200, this.ext, url.activated.rsp(this.request))
                 url.status = false

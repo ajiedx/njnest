@@ -1,6 +1,6 @@
 const { NjSuper } = require('njsuper')
 const { NjViews } = require('../nest/views')
-
+const { JinLoad } = require('../jinload/jinload')
 class NjController extends NjSuper {
     constructor(dt, objx) {
         super(dt, objx)
@@ -14,7 +14,9 @@ class NjController extends NjSuper {
             this.views = new NjViews('', {views: this.VIEWS, parent: this.name, construct: true})
         }
 
-
+        if (objx.JINLOAD) {
+            this.jin__LOAD = new JinLoad('', {loads: this.JINLOAD, construct: true})
+        }
         
     }
     
