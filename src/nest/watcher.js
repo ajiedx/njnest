@@ -9,7 +9,7 @@ class NjWatcher extends NjSuper {
         setTimeout(() => {
             this.dt.start()
             this.start()
-        }, 700)
+        }, 500)
     }
     
     start() {

@@ -41,6 +41,6 @@ function requestUpdate(host, timer) {
 
 onmessage = function (event) {
     if (event) {
-        requestUpdate(event.data, 1000)
+        requestUpdate(event.data, 500)
     }
 }

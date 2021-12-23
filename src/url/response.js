@@ -9,7 +9,7 @@ class NjUrlResponse extends NjSuper {
 
         if (this.controller) {
             if (this.typeof(this.controller) == 'string') {
-                
+
                 if(this.controller == 'default') {
                     if (this.sql) {
                         console.log(this.sqlName)
@@ -17,16 +17,15 @@ class NjUrlResponse extends NjSuper {
                             const { NjMysqlController } = require('../sql/mysqlcontroller')
                             this.controller = new NjMysqlController('NjMysqlController', this)
                         }
-                           
+
 
                     } else {
                         this.controller = new NjController('NjController', this)
                     }
-                    
-                    // console.log('aaaaaaaaa', this.controller)
+
                 }
             } else if (this.typeof(this.controller) == 'function') {
-                
+
             } else if (this.controller instanceof NjController) {
                 this.controller = new NjController('NjController', this)
             } else if (this.instanceAll(NjController, this.controller)) {
@@ -50,12 +49,12 @@ class NjUrlResponse extends NjSuper {
                     if (this.controller.views[i] instanceof NjViews) {
                         if (this.controller.views[i][view]) {
                             return this.controller.views[i][view]
-                        } 
+                        }
                     }
                 }
             }
         }
-        
+
         return false
 
     }
@@ -68,12 +67,12 @@ class NjUrlResponse extends NjSuper {
             } else {
                 return this.controller.crsp(this.response, req)
             }
-            
+
         } else {
             return this.response({html: this.html}, req)
         }
     }
-    
+
     update() {
         this.urls.setUrl(this.path, this)
     }

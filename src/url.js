@@ -12,17 +12,13 @@ class NjUrl extends NjParser {
         this.status = false
         this.head = 200
 
-        if (this.jsDir) {  
+        if (this.jsDir) {
             this.onScriptsLinks()
 
         }
-
         this.noImageScriptsWorkersDocs = ['script', 'worker', 'image', 'document']
-
     }
-
     onScriptsLinks() {
-
         if (this.jinload) {
             for (const i in this.njfile) {
                 if(this.njfile[i] instanceof NjFile) {
@@ -32,9 +28,8 @@ class NjUrl extends NjParser {
                         }
                     })
                 }
-                
             }
-        }    
+        }
 
         if (this.jsScripts) {
             for (const i in this.jsScripts) {
@@ -49,7 +44,7 @@ class NjUrl extends NjParser {
                 }
             }
         }
-        
+
         if (this.cssLinks) {
             for (const i in this.cssLinks) {
                 if(this.cssLinks[i] instanceof NjFile) {
@@ -64,7 +59,7 @@ class NjUrl extends NjParser {
             }
         }
 
-        
+
     }
 
 
@@ -92,14 +87,14 @@ class NjUrl extends NjParser {
 
         if (path.includes('.')) { // REGEX
             let length = 0
-            for (const i in this.paths) 
+            for (const i in this.paths)
                 length = length + 1
             let symbolpath = this.resolveObject(path, url)
             Object.assign(this.paths, { [length]: symbolpath })
         } else if (options.name) {
             if (path === '/') this.__INDEX = options.name
             this[options.name] = this.resolveObject(options.name, url)
-        } 
+        }
     }
 
     check(req, loop) {
@@ -127,12 +122,12 @@ class NjUrl extends NjParser {
                                 break
                             }
                         }
-                    } 
+                    }
                 }
 
                 if (this.activated) this.status = true
                 else this.status = false
-                
+
             } else if (this[paths[1]]) {
                 this.activated = this[paths[1]]
                 this.status = true
@@ -165,23 +160,23 @@ class NjUrl extends NjParser {
                         this.status = true
                         // this.head = 200
                         // if(this.paths[i].head) {
-                        //     this.head = this.paths[i].head  
+                        //     this.head = this.paths[i].head
                         // }
 
-                    } 
+                    }
                     // else {
                     //     this.status = 404
                     //     this.head = 404
                     //     this.active = 404
-        
+
                     // }
                 }
-    
+
             }
         }
 
-        
-        
+
+
 
 
 

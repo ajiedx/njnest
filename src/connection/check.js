@@ -18,7 +18,7 @@ class NjCheck extends NjResponse {
         const [firstLine, ...otherLines] = data.toString().split('\n')
         const [perspective, path, network] = firstLine.trim().split(' ')
 
-        if(this.compareBegining('HTTP', network)) {
+        if(this.isIntro('HTTP', network)) {
             this.httpVersion = network + ' '
             const headers = Object.fromEntries(otherLines.filter(_=>_)
             .map(line=>line.split(':').map(part=>part.trim()))
@@ -31,7 +31,7 @@ class NjCheck extends NjResponse {
                 headers,
             }
         }
-        // if (!this.compareBegining('image', this.request.headers.Accept)) {
+        // if (!this.isIntro('image', this.request.headers.Accept)) {
         //     if (!path.includes('js') || !path.includes('css')) {
         //         console.log('\x1b[33m%s\x1b[0m', this.request)
         //         console.log('\x1b[34m%s\x1b[0m', this.request.headers)
@@ -53,8 +53,8 @@ class NjCheck extends NjResponse {
     async checkReload(data) {
         const [firstLine, ...otherLines] = data.toString().split('\n')
         const [perspective, path, network] = firstLine.trim().split(' ')
-        if (this.compareBegining('RELOAD', perspective)) {
-            if (this.compareBegining('/jinload', path)) {
+        if (this.isIntro('RELOAD', perspective)) {
+            if (this.isIntro('/jinload', path)) {
                 this.reloadFile = path.split('/')
                 this.reloadFile = this.reloadFile[2] + '/' + this.reloadFile[3]
                 this.response = '\r\n'
@@ -68,7 +68,7 @@ class NjCheck extends NjResponse {
                     }
                 }
             }
-        } else if (this.compareBegining('/jinload', path)) {
+        } else if (this.isIntro('/jinload', path)) {
             if ('/jinload.js' === path) {
                 this.check(data)
             } else {
@@ -109,14 +109,14 @@ class NjCheck extends NjResponse {
         for(const i in this.urls) {
 
             if (this.urls[i].jsDir) {
-                if (this.compareBegining('text/html', this.request.headers.Accept)) {
+                if (this.isIntro('text/html', this.request.headers.Accept)) {
 
                     this.ext = 'html'
 
-                } else if (this.compareBegining('text/js', this.request.headers.Accept)) {
+                } else if (this.isIntro('text/js', this.request.headers.Accept)) {
                     
                     this.ext = 'js'
-                } else if (this.compareBegining('text/css', this.request.headers.Accept)) {
+                } else if (this.isIntro('text/css', this.request.headers.Accept)) {
                     this.ext = 'css'
                 }
 
@@ -138,7 +138,7 @@ class NjCheck extends NjResponse {
                 }
             } else if (this.urls[i].sql) {
                 
-                if (!this.compareBegining('image', this.request.headers.Accept)) {
+                if (!this.isIntro('image', this.request.headers.Accept)) {
                     this.urls[i].check(this.request)
                     if (this.urls[i].activated instanceof NjUrlResponse) {
 
