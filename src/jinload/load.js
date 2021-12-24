@@ -5,6 +5,7 @@ class JinParser extends NjSuper {
         this.regex = {
             html: /[\s\S\/]+?\<|\>\b/gm
         }
+
     }
 
     html(htm) {
@@ -73,14 +74,86 @@ class JinParser extends NjSuper {
     }
 
     x1(file) {
-        let splchars = '\n *', sym = '*', pjms = [], line = [''], id = 0, pjm = [], x1id = -1, split = false, splitchar = ''
-        let launch = false, lid = 0, low = [], x1 = {}, x1in = {}, x1j = {}, x1jid = 0, star = false, x1x = {}, x1n = {}
-        let last = '', sptag = '', ids = [], idr = [], idids = 0, x1b = {}
+        const objElement = (string, value) => {
+            let ctag = [], vtag = [], vr = 0, elmnt = {}
+            ctag = this.splitCharsFilter(string, ' }*=', ' }*')
+            let tagf = false
+            for (var es = 0; es < ctag.length; es++) {
+                if (ctag[es] !== '' && ctag[es] != undefined) {
+                    if (!tagf) vtag[0] = ctag[es], vr = vr + 1
+                    else if (this.isEnd('=', ctag[es]))  vtag[vr] = [this.filterChars(ctag[es], ' ='), this.filterChars(ctag[es +1], ' \n')], vr = vr + 1, es++
+                    else if (value) vtag[vr] = vtag[vr] ? vtag[vr]+' '+ ctag[es] : ctag[es]
+                    tagf = true
+                }
+            }
+            if (value) {
+                if (vtag.length > 1) {
+                    for (var es = 1; es < vtag.length - 1; es++) {
+                        this.pin(elmnt , vtag[es])
+                    }
+                    Object.assign(elmnt, {name: vtag[0], value: vtag[vtag.length - 1]})
+                }
+            } else {
+                for (var es = 1; es < vtag.length ; es++) {
+                    this.pin(elmnt, vtag[es])
+                }
+                Object.assign(elmnt, {name: vtag[0]})
+            }
+
+
+            return elmnt
+        }
+
+        let pjms = [], line = [''], id = 0
+        let launch = false, lid = 0, low = [], x1 = {}, x1in = {}, x1j = {}
+        let last = '', sptag = '', ids = [], idr = [], element = {}
+
+        const pinx1 = (id, pj) => {
+            for (let idj in x1) {
+                if (idj > pj && idj < id) {
+                    this.pin(x1[id], x1[idj])
+                    delete x1[idj]
+                }
+            }
+        }
+
+        const pinx1j = (id, pj) => {
+            for (let idj in x1j) {
+                if (idj > pj && idj < id) {
+                    this.pin(x1[id], x1j[idj])
+                    delete x1j[idj]
+                } else {
+                    this.pin(x1, x1j[idj], idj)
+                }
+            }
+        }
+
+        const pinx1in = (id, pj) => {
+            for (let idn in x1in) {
+                if (idn > pj && idn < id) {
+                    this.pin(x1[id], x1in[idn])
+                    delete x1in[idn]
+                } else {
+                    this.pin(x1, x1in[idn], idn)
+                    delete x1in[idn]
+                }
+            }
+        }
+
+
+        const pin = (id, pj, up) => {
+            if (up) pinx1(id, pj), pinx1j(id, pj)
+            else pinx1j(id, pj), pinx1(id, pj)
+        }
+
+
         for (let i in file) {
             if (file[i] !== ' ') {
                 if (file[i] === '*') {
                     // console.log(line[lid])
-                    pjms[id] = line[lid] + file[i],  lid = lid + 1
+                    // pjms[id] = '#', id = id + 1
+                    pjms[id] = line[lid] + ' ' + file[i],  lid = lid + 1
+
                     line[lid] = file[i]
                     id = id + 1
                 } else if (file[i - 1] === ' ') {
@@ -111,10 +184,11 @@ class JinParser extends NjSuper {
                         pjms[id] = line[lid],  lid = lid + 1, line[lid] = file[i]
                         id = id + 1
                     }
-                } else if (file[i] === '\n') {
-                    if (line[lid - 1] === '*' || line[lid - 1] === '\n') {
-                        low = this.filterChars(line[lid], '\n').split(' ')
 
+                } else if (file[i] === '\n') {
+
+                    if (line[lid - 1] === '*' || line[lid - 1] === '\n' ) {
+                        low = this.filterChars(line[lid], '\n').split(' ')
                         for (const l in low) {
                             pjms[id] = ' l ' + low[l]
                             let pj = id - 1
@@ -126,83 +200,18 @@ class JinParser extends NjSuper {
                                     last = pjms[pj]
                                     sptag = this.splitOnce(pjms[pj], low[l]+' ', 'right', 'last')
 
-                                    if (this.isIntro('#', pjms[id - 1]) && !this.isIntro('$', pjms[pj])) {
+                                    if (this.isIntro('#', pjms[id - 1])) {
                                         if (sptag[0]=== '' || this.isIntro('s', sptag[0])) {
-                                            x1[id] = {}
-                                            for (let idj in x1) {
-                                                if (idj > pj && idj < id) {
-                                                    // console.log(x1[idj], '[][][]['+idj+id+pj+'][]][][]')
-                                                    this.pin(x1[id], x1[idj])
-                                                    delete x1[idj]
-                                                }
-                                            }
-                                            for (let idj in x1j) {
-                                                if (idj > pj && idj < id) {
-                                                    this.pin(x1[id], x1j[idj])
-                                                    delete x1j[idj]
-                                                } else {
-                                                    this.pin(x1, x1j[idj], idj)
-                                                }
-                                            }
-
-                                            x1[id].in = sptag[1]
-                                            idids = idids + 1
-
+                                            x1[id] = {}, pin(id, pj, 'up')
+                                            x1[id].in = objElement(sptag[1])
                                         } else if (x1j.hasOwnProperty(0)) {
-
-                                            x1[id] = {}
-                                            for (let idj in x1j) {
-                                                if (idj > pj && idj < id) {
-                                                    this.pin(x1[id], x1j[idj])
-                                                    delete x1j[idj]
-                                                } else {
-                                                    this.pin(x1, x1j[idj], idj)
-                                                }
-                                            }
-                                            for (let idj in x1) {
-                                                if (idj > pj && idj < id) {
-                                                    this.pin(x1[id], x1[idj])
-                                                    delete x1[idj]
-                                                }
-                                            }
-                                            // this.output(x1, '  -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=', 3)
-                                            x1[id].in = sptag[1]
-
-                                            idids = idids + 1
+                                            x1[id] = {}, pin(id, pj)
+                                            x1[id].in = objElement(sptag[1])
                                         } else {
-                                            // this.output(x1, 'asssssssdasd')
-                                            this.output(x1j, 'asssssssdasd')
-                                            console.log(sptag[1], pj, id, low[l])
-                                            x1[id] = {}
-                                            for (let idn in x1in) {
-                                                if (idn > pj && idn < id) {
-                                                    this.pin(x1[id], x1in[idn])
-                                                    delete x1in[idn]
-                                                } else {
-                                                    this.pin(x1, x1in[idn], idn)
-                                                    delete x1in[idn]
-                                                }
-                                            }
-
-                                            for (let idj in x1j) {
-                                                if (idj > pj && idj < id) {
-                                                    this.pin(x1[id], x1j[idj])
-                                                    delete x1j[idj]
-                                                } else {
-                                                    this.pin(x1, x1j[idj], idj)
-                                                }
-                                            }
-                                            for (let idj in x1) {
-                                                if (idj > pj && idj < id) {
-                                                    this.pin(x1[id], x1[idj])
-                                                    delete x1[idj]
-                                                }
-                                            }
-
-                                            x1[id].in = sptag[1]
+                                            x1[id] = {}, pinx1in(id, pj), pinx1(id, pj, 'up')
+                                            x1[id].in = objElement(sptag[1])
                                         }
 
-                                        x1id = 0
                                     } else {
                                         x1j[id] = {}
                                         for (let idn in x1in) {
@@ -214,26 +223,16 @@ class JinParser extends NjSuper {
                                                 delete x1in[idn]
                                             }
                                         }
-                                        x1j[id].in = sptag[1]
-
-                                        x1id = x1id + 1
+                                        x1j[id].in = objElement(sptag[1])
                                     }
-
-
-
                                     pjms[pj] = sptag[0]
-                                    this.output(x1)
-
-                                    pjms[id] = '#' + x1id + ' ' + sptag[1] + pjms[id]
+                                    pjms[id] = '# ' + sptag[1] + pjms[id]
                                     break;
-                                } else if (!this.isIntro('#', pjms[pj]) && pjms[pj] !== '') {
+                                } else if (!this.isIntro('#', pjms[pj]) && pjms[pj] !== '' && !this.isIntro('s', pjms[pj])) {
                                     pjms[id] = pjms[pj] + pjms[id]
-                                    this.pin(x1in, pjms[pj], pj)
-                                    console.log(pj, id)
-                                    // this.output(pjms[id], '___________')
+                                    this.pin(x1in, objElement(pjms[pj], 'value'), pj)
                                     pjms[pj] = ''
                                     // pjms[pj] = '#' + pjms[pj]
-
                                 }
                                 pj = pj - 1
                             }
@@ -254,55 +253,8 @@ class JinParser extends NjSuper {
             }
         }
 
-        this.output(pjms)
-        this.output(line)
-        this.output(x1)
-        // console.log(pjms, line, x1)
-        // let wrapper = false, slpjms = []
-        // id = 0
-        // pjms[0][0] = '*' + pjms[0][0]
-        // for (let i in pjms) {
-        //     if (this.isIntro('*',pjms[i][0]) || this.isIntro('\n',pjms[i][0])) {
-        //         for (let l in pjms[i]) {
-        //             if (pjms[i][l] === '}' || pjms[i][l] === 's' || this.isEnd('\\*', pjms[i][l])) {
-        //                 pjms[i].push('}')
-        //                 wrapper = false
-        //                 break
-        //             } else wrapper = true
-        //
-        //         }
-        //
-        //         if (wrapper) {
-        //             console.log(pjms[i])
-        //             console.log(id)
-        //             slpjms[id] = []
-        //
-        //             let as = false
-        //
-        //             for (let l in pjms[i]) {
-        //                 let ls = []
-        //                 for (let s in pjms) {
-        //                     if (Number(i) > Number(s)) {
-        //                         for (let c in pjms[s]) {
-        //                             if (this.filterChars(pjms[i][l], '\n*') === this.filterChars(pjms[s][c], '\n*')) {
-        //                                 as = true
-        //                                 slpjms[id] = [pjms[s][c]]
-        //                                 ls[0] = s
-        //                                 ls[1] = c
-        //                             } else if (as) {
-        //                                 slpjms[id]= slpjms[id] + ' ' +  [pjms[s][c]]
-        //                             }
-        //                         }
-        //                     }
-        //                 }
-        //
-        //                 id = id + 1
-        //                 console.log(ls, pjms[ls[0]])
-        //             }
-        //         }
-        //     }
-        // }
-
+        // this.output(pjms)
+        this.createX1Elements(x1)
     }
 
     matchBool(string, reg) {
@@ -333,7 +285,68 @@ class JinCache extends JinParser {
 class JinApi extends JinParser {
     constructor(dt, objx) {
         super(dt, objx)
+        this.elements = {}
+        this.options = {}
+        this.id = 0
+        this.ids = []
+    }
 
+    x1viload(text) {
+        this.x1(text)
+        for (let i in this.ids) {
+            if (this.options[this.ids[i]][0] === 'append') {
+                console.log(this.options[this.ids[i]][0])
+                let query = document.querySelector(this.options[this.ids[i]][1])
+                query.append(this.elements[this.ids[i]])
+            }
+        }
+    }
+
+    createX1Elements(x1, type) {
+        this.output(x1)
+        this.ids = []
+        function createX1Child (element, x1in) {
+            for (let x in x1in) {
+                if (!isNaN(x)) {
+                    if (x1in[x].in) {
+                        element.append(document.createElement(x1in[x].in.name))
+                        for (let a in x1in[x].in) {
+                            if (!isNaN(a)) {
+                                console.log(x1in[x].in[a])
+                                element.children[x].setAttribute(x1in[x].in[a][0], x1in[x].in[a][1])
+                            }
+                        }
+                        createX1Child(element.children[x], x1in[x])
+                    } else {
+                        element.append(document.createElement(x1in[x].name))
+                        element.children[x].innerText = x1in[x].value
+                        for (let a in x1in[x]) {
+                            if (!isNaN(a)) {
+                                element.children[x].setAttribute(x1in[x][a][0], x1in[x][a][1])
+                            }
+                        }
+                    }
+
+                    // console.log(element)
+                }
+            }
+        }
+        for (let x in x1) {
+            if (!isNaN(x)) {
+                console.log(x1[x].in.name)
+                this.elements[this.id] = document.createElement(x1[x].in.name)
+                for (let a in x1[x].in) {
+                    if (!isNaN(a)) {
+                        this.elements[this.id].setAttribute(x1[x].in[a][0], x1[x].in[a][1])
+                        this.options[this.id] = x1[x].in[a]
+
+                    }
+                }
+                createX1Child(this.elements[this.id], x1[x])
+                this.ids.push(this.id)
+                this.id = this.id + 1
+            }
+        }
     }
 
     createElements(wrap, elements) {
@@ -393,7 +406,7 @@ class JinApi extends JinParser {
         if (this.isIntro('<', text[0])) syntax = 'html'
         else syntax = 'pjm'
         if (syntax === 'pjm') {
-            this.x1(text)
+            this.x1viload(text)
         } else {
             let regexTags = ['']
             regexTags = regexTags.concat(this.match(text, syntax))
@@ -578,13 +591,7 @@ class JinLoad extends JinApi {
             worker.onmessage = function(event) {
                 // console.log(event.data, '')
                 if (event.data === 'RELOAD') {
-                    // location.reload()
                     location.href = '/'
-
-                    // setTimeout(() => {
-                    //     location.assign('/comestas/hello')
-                    // }, 300)
-
                 } else {
                     if (window.jinload) {
                         this.reloadFileName = event.data.split('/')[0].split('.')[0]

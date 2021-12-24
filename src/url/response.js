@@ -6,7 +6,7 @@ const { NjController } = require('./controller')
 class NjUrlResponse extends NjSuper {
     constructor(dt, objx, t) {
         super(dt, objx, t)
-
+        
         if (this.controller) {
             if (this.typeof(this.controller) == 'string') {
 
