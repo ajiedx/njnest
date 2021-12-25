@@ -28,8 +28,9 @@ class NjConnection extends NjCheck {
 
             this.conn = net.createServer(socket => {
                 socket.on('data', data => {
+                    this.response = false
                     this.checkReload(data)
-
+                    
                     socket.write(this.response)
                     socket.end()
                     // socket.end((err)=> {console.log(err)})

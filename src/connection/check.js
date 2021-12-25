@@ -30,6 +30,9 @@ class NjCheck extends NjResponse {
                 network,
                 headers,
             }
+            this.perspective = perspective
+            this.headers = headers
+
         }
         // if (!this.isIntro('image', this.request.headers.Accept)) {
         //     if (!path.includes('js') || !path.includes('css')) {
@@ -92,6 +95,8 @@ class NjCheck extends NjResponse {
                         }
                     }
 
+                    if (!this.response) {this.response = '\r\n Not Found'}
+
                 }
 
             }
@@ -109,33 +114,47 @@ class NjCheck extends NjResponse {
         for(const i in this.urls) {
 
             if (this.urls[i].jsDir) {
-                if (this.isIntro('text/html', this.request.headers.Accept)) {
-
-                    this.ext = 'html'
-
-                } else if (this.isIntro('text/js', this.request.headers.Accept)) {
+                if (this.headers['JinLoad']) {
+                    if (this.headers['Event'] === 'load') {
+                        if (this.headers['JinLoadName'] ) {
+                            this.response = this.codeRes(200, '*/*', this.urls[i].JinLoad.rsp(this.headers['JinLoadName']))
+                            if (!this.response) {
+                                this.response = this.codeRes(400, this.ext, 'Not Found')
+                            }
+                        }
+                        this.urls[i].status = false
+                        this.urls[i].activated = false
+                    }
+                } 
+                if (!this.response) {
+                    if (this.isIntro('text/html', this.request.headers.Accept)) {
+                        this.ext = 'html'
+    
+                    } else if (this.isIntro('text/js', this.request.headers.Accept)) {
+                        
+                        this.ext = 'js'
+                    } else if (this.isIntro('text/css', this.request.headers.Accept)) {
+                        this.ext = 'css'
+                    }
+    
+                    this.urls[i].check(this.request)
+                    if (!this.urls[i].activated ) {
+                        this.urls[i].check(this.request, true)
+                    }
                     
-                    this.ext = 'js'
-                } else if (this.isIntro('text/css', this.request.headers.Accept)) {
-                    this.ext = 'css'
-                }
-
-                this.urls[i].check(this.request)
-                if (!this.urls[i].activated) {
-                    this.urls[i].check(this.request, true)
+                    if (this.urls[i].activated instanceof NjUrlResponse) {
+                        this.qualify(this.urls[i])
+                    } else if (this.urls[i].activated instanceof NjView) {
+                        // console.log(this.urls[i].activated, '_____')
+                        this.ext = '*/*'
+                        this.qualify(this.urls[i])
+                        console.log(this.response)
+                    } else {
+                        this.response = this.codeRes(400, this.ext, 'Not Found')
+                        this.urls[i].status = false
+                    }
                 }
                 
-                if (this.urls[i].activated instanceof NjUrlResponse) {
-                    this.qualify(this.urls[i])
-                } else if (this.urls[i].activated instanceof NjView) {
-                    // console.log(this.urls[i].activated, '_____')
-                    this.ext = '*/*'
-                    this.qualify(this.urls[i])
-                    console.log(this.response)
-                } else {
-                    this.response = this.codeRes(400, this.ext, 'Not Found')
-                    this.urls[i].status = false
-                }
             } else if (this.urls[i].sql) {
                 
                 if (!this.isIntro('image', this.request.headers.Accept)) {

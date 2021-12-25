@@ -1,6 +1,6 @@
 const { NjUrlResponse } = require('./url/response')
 const { NjParser } = require('./parse')
-
+const { JinLoad } = require('./jinload/jinload')
 const { NjFiles, NjFile } = require('njfile')
 
 class NjUrl extends NjParser {
@@ -11,7 +11,7 @@ class NjUrl extends NjParser {
         this.active = 0
         this.status = false
         this.head = 200
-
+        this.JinLoad = {}
         if (this.jsDir) {
             this.onScriptsLinks()
 
@@ -69,7 +69,7 @@ class NjUrl extends NjParser {
             options.name = options.name[options.name.length - 1]
             if(options.name.includes('.')) options.name = options.name.split('.')[0]
         }
-
+        if (options.JINLOAD) this.JinLoad = new JinLoad({lastLoads: options.JINLOAD}, this.JinLoad); delete options.JINLOAD
         let url
         if (this.url) url = {path: this.url + path}
         else url = {path}

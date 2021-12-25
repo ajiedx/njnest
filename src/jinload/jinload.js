@@ -5,11 +5,20 @@ class JinLoad extends NjSuper {
     constructor(dt, objx) {
         super(dt, objx)
 
-        if (objx.load) {
-            for (const i in this.load) {
-                this[i] = this.load[i]
+        if (dt.lastLoads) {
+            for (const i in this.dt.lastLoads) {
+                this[i] = this.dt.lastLoads[i]
             }
 
+        }
+    }
+
+    rsp(name) {
+        console.log(this, name)
+        if (this[name]) {
+            return this[name]
+        } else {
+            return false
         }
     }
 }
