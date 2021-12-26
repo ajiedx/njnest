@@ -7,11 +7,13 @@ class NjResponse extends NjSuper {
         super(dt, objx)
         this.unicode = 'charset=utf-8'
         this.jinload = new JinLoads()
+        this.rspHeaders = []
     }
 
-    head(code, contype) {
+    head(code, type) {
 
         this.inside = ''
+        let contype = ''
         if (code === 401) {
             this.status = ' Unathorized'
         } else if (code === 200) {
@@ -20,12 +22,23 @@ class NjResponse extends NjSuper {
             this.status = ' Bad Request'
         }
 
+        if (type.includes('-')) {
+            [contype, type] = type.split('-')
+        } 
+
         this.response = this.httpVersion + code + this.status + '\r\n\
 Access-Control-Allow-Origin: *\r\n\
 Connection: Keep-Alive\r\n\
-Content-Type: ' + contype + '; ' + this.unicode + '\r\n\
+Content-Type: ' + type + '; ' + this.unicode + '\r\n\
 Keep-Alive: timeout=5, max=1000 \r\n\
-'
+'       
+        if (this.rspHeaders.length > 0) {
+            for (const i in this.rspHeaders) {
+                this.response = this.response + this.rspHeaders[i] + '\r\n'
+            }
+            this.rspHeaders = []
+        }
+
         if (code === 401) {
             this.inside = 'WWW-Authenticate: Basic realm="Login request.", charset= "UTF-8"\r\n'
         }
@@ -36,8 +49,13 @@ Keep-Alive: timeout=5, max=1000 \r\n\
 
         this.response = this.response + this.inside
 
+        if (contype === 'incomplete') {
+            return this.response
+        } else {
+            return this.response + '\r\n'
+        }
        
-        return this.response + '\r\n'
+        
     }
 
     codeRes(code, ext, rsp) {
@@ -48,15 +66,20 @@ Keep-Alive: timeout=5, max=1000 \r\n\
             conext = ext
         }
 
-        
-        return this.head(code, conext) + rsp
+        if (!rsp) return false
+        else return this.head(code, conext) + rsp
     }
 
     async load(text) {
         if (this.ext === 'css') {
-            this.response = this.codeRes(200, '*/*', this.jinload.css(text))
+            this.rspHeaders.push('JinLoad: UpdateCss')
+            
+            this.response = this.codeRes(200, 'incomplete-text/css', this.jinload.css(text))
+            console.log(this.response)
+            
         } else {
             this.response = this.codeRes(200, '*/*', text.content)
+           
         }
     }
 

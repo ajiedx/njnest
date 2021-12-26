@@ -553,7 +553,6 @@ class JinLoad extends JinApi {
     }
 
     load(name, func, ext, state) {
-        if (state) window.newJinLoadState = state
         let perspective = 'GET'
         if (state === 'update') perspective = 'PUT'
 
@@ -576,7 +575,7 @@ class JinLoad extends JinApi {
                         else if (ext === 'css') console.log('##################        '+name+'.css        ##################')
                     }
                     func(text)
-                    if (state) jinLoadTarget.dispatchEvent(jinLoadEvent)
+                    if (state) onJinLoad(state), console.log(state)
                 } else {
                     func(text)
                 }
@@ -630,11 +629,10 @@ class JinLoad extends JinApi {
     }
 
     rqs(name, path, func, headers, errsp, state) {
-        if (state) window.newJinLoadState = state
         fetch(path, headers).then(response => {
             response.text().then((text) => {
                 func(text)
-                if (state) jinLoadTarget.dispatchEvent(jinLoadEvent)
+                if (state) onJinLoad(state), console.log(state)
             })
         }).catch((error) => {
             console.error('JinLoad Fetch Error from "'+ name +'" '+ errsp + ':', error)
@@ -691,48 +689,22 @@ class JinLoad extends JinApi {
             }
         }
     }
-
-    dispatchEvent(name) {
-        window.newJinLoadState = name
-        if (jinLoadTarget) {
-            jinLoadTarget.dispatchEvent(jinLoadEvent)
-        }
-    }
-
 }
 
-const jinLoadEvent = new CustomEvent('onjinload', {
-    bubbles: true,
-    detail: {switch: function(state) {
-        window.jinLoadState = state
-    }}
-})
-
-const jinLoadTarget = new EventTarget()
 
 window.jinload = new JinLoad()
 
-jinLoadTarget.addEventListener('onjinload', function(jinEvent) {
-    if (window.newJinLoadState) {
-        let newState = window.newJinLoadState
-        jinEvent.detail.switch(newState)
-        window.newJinLoadState = undefined
-    }
-
-    if (window.jinLoadState === 'ready') {
+function onJinLoad(state) {
+    if (state === 'ready') {
         jinload.init()
         let comestas = document.querySelector('#comestas')
         let help = document.querySelector('.hello')
         comestas.click()
         help.click()
-
-        // jinload.dispatchEvent('htmlAttributes')
-
+        console.log('----------------------------------------')
     }
-
-    if (window.jinLoadState === 'reload') {
+    if (state === 'jinReload') {
         jinload.startReload()
     }
 
-
-})
+}

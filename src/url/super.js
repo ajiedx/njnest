@@ -46,10 +46,7 @@ class NjUrlSuper extends NjSuper {
             
             let jsloads = ["document.onreadystatechange = function () { \r\n \
                 if(document.readyState === 'complete') {\r\n \
-                window.newJinLoadState = 'ready' \r\n \
-                if (jinLoadTarget) {\r\n\
-                    jinLoadTarget.dispatchEvent(jinLoadEvent)\r\n\
-                }\r\n "]
+                onJinLoad('ready')\r\n "]
 
             if (this.jinload) {
                 
@@ -60,10 +57,7 @@ class NjUrlSuper extends NjSuper {
                 }
             }
 
-            jsloads.push("window.newJinLoadState = 'reload' \r\n \
-            if (jinLoadTarget) {\r\n\
-                jinLoadTarget.dispatchEvent(jinLoadEvent)\r\n\
-            }\r\n\    }\r\n}")
+            jsloads.push("onJinLoad('jinReload')}}")
             let jsloadrn = ''
             for (const i in jsloads) {
                 jsloadrn = jsloadrn + jsloads[i]

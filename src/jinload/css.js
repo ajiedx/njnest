@@ -17,36 +17,64 @@ class JinStyle {
       if (i[l] === '{') {
         this[prop][index] = {name: line.trim()}
         line = ''
+        console.log(line)
       } else if (i[l] === ':') {  
         value = line.trim()
+        console.log(line)
         line = ''
       } else if (i[l] === ';') {  
         Object.assign(this[prop][index], {[value]: line.trim()})
+        console.log(line)
         line = ''
       } else {
         line = line + i[l]
       }
     }
+    if (prop === 'incss') this[prop].indexify = true
   }
 
   load(file) {
     let json = JSON.parse(file)
+    this.incss = {}
     if (this.style.cssRules.length == 0) {
       for (const i in json) {
         this.style.insertRule(i, json[i])
         this.indexify(i, json[i], 'css')
-
       }
-    } else {
-      console.log(file)
+    } else if (this.css) {
+      let exists = false
       for (const i in json) {
-        this.indexify(i, json[i], 'incss')
-      }
-      for (const i in this.incss) {
-        for (const l in this.incss[i]) {
-          if (l !== 'name') {
-            this.style.cssRules[i].styleMap.set(l, this.incss[i][l])
+        if (this.css[json[i]]) {
+          if (isNaN(i)) {
+            this.indexify(i, json[i], 'css')
+            this.indexify(i, json[i], 'incss')
+          } else {
+            this.indexify('-1 {}', json[i], 'css')
+            this.indexify('-1 {}', json[i], 'incss')
           }
+          exists = true
+        }
+        if (!exists) {
+          this.style.insertRule(i, json[i])
+          this.indexify(i, json[i], 'css')
+          exists = false
+        }
+      }
+      if (this.incss.indexify) {
+        delete this.incss.indexify
+        console.log(this.incss)
+        for (const i in this.incss) {
+          if (this.incss[i].name === '-1') {
+            this.style.cssRules[i].style = {}
+            console.log()
+          } else {
+            for (const l in this.incss[i]) {
+              if (l !== 'name') {
+                this.style.cssRules[i].styleMap.set(l, this.incss[i][l])
+              }
+            }
+          }
+          
         }
       }
     }
