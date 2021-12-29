@@ -6,7 +6,12 @@ const { NjFile, NjFiles } = require('njfile')
 class NjUrlSuper extends NjSuper {
     constructor(dt, objx, t) {
         super(dt, objx, t)
+        this.urlpth = []
+        
+        if (objx.paths) this.addArray(this.urlpth, objx.paths)
+        if (objx.urls) this.addArray(this.urlpth, objx.urls)
 
+        if (!this.urlpth[0]) delete this.urlpth
         if (this.reload == true) {
             const path = require('path')
             let dirname = __dirname.split(path.sep)
@@ -43,13 +48,13 @@ class NjUrlSuper extends NjSuper {
             this.njfile.jinupdate.content = this.njfile.njsuper.content + this.njfile.jinupdate.content
             delete this.jincss
             delete this.njfile.njsuper
-            
+
             let jsloads = ["document.onreadystatechange = function () { \r\n \
                 if(document.readyState === 'complete') {\r\n \
                 onJinLoad('ready')\r\n "]
 
             if (this.jinload) {
-                
+
                 for (const i in this.jinload) {
                     if (this.jinload[i].includes('js')) {
                         jsloads.push("        jinload.js('"+this.jinload[i].split('.')[0]+"')\r\n")
@@ -78,7 +83,7 @@ class NjUrlSuper extends NjSuper {
                 var name = scripts[i].split('/').pop().slice(0, -3)
                 this.jsScripts.defineFile(name, { path: scripts[i] })
 
-            } 
+            }
         }
 
         if (this.cssDir) {
@@ -92,7 +97,7 @@ class NjUrlSuper extends NjSuper {
                 var name = links[i].split('/').pop().slice(0, -4)
                 this.cssLinks.defineFile(name, { path: links[i]})
 
-            } 
+            }
         }
 
         if (this.sql === 'mysql') {

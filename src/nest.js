@@ -10,9 +10,12 @@ const { NjParser } = require('./parse')
 class NjNest extends NjSuper {
     constructor(dt, objx, t) {
         super(dt, objx, t)
+        objx.urls = this.dt
+        // for (const i in objx.urls) {
+        //     objx.urls[i].onAndOn()
+        // }
         this.conn = new NjConnection(dt, objx)
     }
-    
 
     start() {
 
@@ -27,7 +30,7 @@ class NjNest extends NjSuper {
                         } else if (this.reload.dt[i].reloader === 'njreload') {
                             this.reload.set(i, 'restartServer')
                         }
-                    } 
+                    }
                 } else {
                     this.reload.set(i)
                 }
@@ -38,7 +41,7 @@ class NjNest extends NjSuper {
 
         }
 
-  
+
     }
 
     startClient(name) {
@@ -47,7 +50,7 @@ class NjNest extends NjSuper {
         }
 
     }
-    
+
     startWatcher() {
         if (this.reload instanceof NjReload) {
             this.watcher = new NjWatcher(this.reload, {enitity: this.watcherSettings})

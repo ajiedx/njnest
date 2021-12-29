@@ -56,6 +56,7 @@ class NjCheck extends NjResponse {
     async checkReload(data) {
         const [firstLine, ...otherLines] = data.toString().split('\n')
         const [perspective, path, network] = firstLine.trim().split(' ')
+        console.log(path)
         if (this.isIntro('RELOAD', perspective)) {
             if (this.isIntro('/jinload', path)) {
                 this.reloadFile = path.split('/')
@@ -100,9 +101,6 @@ class NjCheck extends NjResponse {
                 }
 
             }
-
-
-
         } else {
             this.check(data)
         }
@@ -110,9 +108,7 @@ class NjCheck extends NjResponse {
 
     async check(data) {
         this.rqs(data)
-
         for(const i in this.urls) {
-
             if (this.urls[i].jsDir) {
                 if (this.headers['JinLoad']) {
                     if (this.headers['Event'] === 'load') {
@@ -125,38 +121,33 @@ class NjCheck extends NjResponse {
                         this.urls[i].status = false
                         this.urls[i].activated = false
                     }
-                } 
+                }
                 if (!this.response) {
+
                     if (this.isIntro('text/html', this.request.headers.Accept)) {
                         this.ext = 'html'
-    
-                    } else if (this.isIntro('text/js', this.request.headers.Accept)) {
-                        
-                        this.ext = 'js'
+                    } else if (this.isIntro('script', this.request.headers['Sec-Fetch-Dest'])) {
+                        this.ext = 'javascript'
                     } else if (this.isIntro('text/css', this.request.headers.Accept)) {
                         this.ext = 'css'
+                    }  else if (this.request.headers['Sec-Fetch-Dest'] === 'image' && this.isIntro('image/avif',  this.request.headers.Accept)) {
+                        if (this.request.path === '/favicon.ico') this.ext = 'image/x-icon'
+                        else this.ext = 'image/*'
                     }
-    
                     this.urls[i].check(this.request)
-                    if (!this.urls[i].activated ) {
-                        this.urls[i].check(this.request, true)
-                    }
-                    
+
                     if (this.urls[i].activated instanceof NjUrlResponse) {
                         this.qualify(this.urls[i])
                     } else if (this.urls[i].activated instanceof NjView) {
-                        // console.log(this.urls[i].activated, '_____')
                         this.ext = '*/*'
                         this.qualify(this.urls[i])
-                        console.log(this.response)
                     } else {
                         this.response = this.codeRes(400, this.ext, 'Not Found')
                         this.urls[i].status = false
                     }
                 }
-                
+
             } else if (this.urls[i].sql) {
-                
                 if (!this.isIntro('image', this.request.headers.Accept)) {
                     this.urls[i].check(this.request)
                     if (this.urls[i].activated instanceof NjUrlResponse) {
@@ -166,20 +157,7 @@ class NjCheck extends NjResponse {
                 }
 
             }
-
-
         }
-
-
-        // else {
-        //     for(const i in this.urls) {
-        //         if (this.urls[i].type !== 'web') {
-        //             this.urls[i].check(this.request.path)
-        //             this.qualify(this.urls[i])
-        //         }
-        //     }
-        // }
-
     }
 
 }

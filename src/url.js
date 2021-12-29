@@ -6,24 +6,71 @@ const { NjFiles, NjFile } = require('njfile')
 class NjUrl extends NjParser {
     constructor(dt, objx, t) {
         super(dt, objx, t)
+
         this.objx = NjUrlResponse
+        this.JinLoad = {}
+        if (this.urlpth) {
+            let cwd = process.cwd()
+            const path = require( 'path' );
+            const { readdirSync } = require('fs')
+            for (var i in this.urlpth) {
+                if (this.isEnd('.js', this.urlpth[i])) {
+                    let name = this.urlpth[i].split('/'), ps = ''
+                    if (name[0] === '.') ps = name.slice(1, name.length)
+                    else ps = name.slice(0, name.length)
+                    name = name[name.length - 1].split('.')[0]
+                    this[name] = require('../../../'+ps.join('/'))
+                    this.urlRspfy(name, this[name])
+                } else {
+                    let pi = [cwd]
+                    this.urlpth[i] = this.urlpth[i].split('/')
+                    let ps = []
+                    if (this.urlpth[i][0] === '.') {
+                        for (var c = 1; c < this.urlpth[i].length; c++) {
+                            pi.push(this.urlpth[i][c])
+                            ps.push(this.urlpth[i][c])
+                        }
+                    } else {
+                        for (var c = 0; c < this.urlpth[i].length; c++) {
+                            pi.push(this.urlpth[i][c])
+                            ps.push(this.urlpth[i][c])
+                        }
+                    }
+
+                    this.urlpth[i] = pi.join(path.sep)
+                    let dir = readdirSync(this.urlpth[i], {withFileTypes: true})
+                    for (const i in dir) {
+                        if (this.isEnd('.js', dir[i].name)) {
+                            let rqir = pi; rqir.push(dir[i].name)
+                            let name = dir[i].name.split('.')[0]
+                            this[name] = require('../../../'+ps.join('/')+'/'+dir[i].name)
+                            this.urlRspfy(name, this[name])
+
+                        }
+                    }
+                }
+            }
+        }
+
         this.paths = {}
         this.active = 0
         this.status = false
         this.head = 200
-        this.JinLoad = {}
+
         if (this.jsDir) {
             this.onScriptsLinks()
 
         }
         this.noImageScriptsWorkersDocs = ['script', 'worker', 'image', 'document']
     }
+
     onScriptsLinks() {
         if (this.jinload) {
             for (const i in this.njfile) {
                 if(this.njfile[i] instanceof NjFile) {
+                    console.log(this.njfile[i].url)
                     this.on(this.njfile[i].url, {
-                        response: () => {
+                        rsp: () => {
                             return this.njfile[i].content
                         }
                     })
@@ -37,12 +84,21 @@ class NjUrl extends NjParser {
                     this.jsScripts[i].toString()
                     const path = this.jsScripts[i].path.slice(1, this.jsScripts[i].path.length)
                     this.on(path, {
-                        response: () => {
+                        rsp: () => {
                             return this.jsScripts[i].content
                         }
                     })
                 }
             }
+            this.on('/favicon.ico', {
+                rsp: () => {
+                    const { readFileSync, statSync } = require('fs')
+                    console.log(__dirname)
+                    const file = readFileSync('./public/favicon.ico').toString()
+                    console.log(file)
+                    return file
+                }
+            })
         }
 
         if (this.cssLinks) {
@@ -51,7 +107,7 @@ class NjUrl extends NjParser {
                     this.cssLinks[i].toString()
                     const path = this.cssLinks[i].path.slice(1, this.cssLinks[i].path.length)
                     this.on(path, {
-                        response: () => {
+                        rsp: () => {
                             return this.cssLinks[i].content
                         }
                     })
@@ -59,22 +115,18 @@ class NjUrl extends NjParser {
             }
         }
 
-
     }
 
-
-    on(path, options) {
-        if (!options.name) {
-            options.name = path.split('/')
-            options.name = options.name[options.name.length - 1]
-            if(options.name.includes('.')) options.name = options.name.split('.')[0]
-        }
-        if (options.JINLOAD) this.JinLoad = new JinLoad({lastLoads: options.JINLOAD}, this.JinLoad); delete options.JINLOAD
-        let url
+    urlRspfy(name, options) {
+        let path, url
+        options.name = name
+        if (options.url) path = options.url
+        else if (options.path)  path = options.path
+        if (options.JINLOAD && !path.includes('.')) this.JinLoad = new JinLoad({lastLoads: options.JINLOAD}, this.JinLoad); delete options.JINLOAD
         if (this.url) url = {path: this.url + path}
         else url = {path}
 
-        if (this.jsDir) options.html = this.html
+        if (this.jsDir && !path.includes('.')) options.html = this.html
         if (options.idx) options.id = options.idx
 
         if (this.sql) {
@@ -91,18 +143,42 @@ class NjUrl extends NjParser {
                 length = length + 1
             let symbolpath = this.resolveObject(path, url)
             Object.assign(this.paths, { [length]: symbolpath })
-        } else if (options.name) {
+        } else if (options.name && !path.includes('.')) {
+
             if (path === '/') this.__INDEX = options.name
             this[options.name] = this.resolveObject(options.name, url)
         }
     }
 
-    check(req, loop) {
+    on(path, options) {
+        let name
+        if (!options.name) {
+            name = path.split('/')
+            name = name[name.length - 1]
+            if(name.includes('.')) name = name.split('.')[0]
+        } else name = options.name
+        options.path = path
+        this.urlRspfy(name, options)
+    }
 
-        if(req.path.includes('/')) {
+    check(req, loop) {
+        if (req.path.includes('.')) {
+            if (this.paths) {
+                for (const i in this.paths) {
+                    if(this.paths[i].path === req.path) {
+                        this.status = true
+                        this.activated = this.paths[i]
+                        console.log(this.activated, 'kkkkkkkkkkkkkkkkkkkk')
+                        break
+                    } else {
+                        this.status = false
+                    }
+                }
+            }
+        } else if(req.path.includes('/')) {
             let count = this.countChars(req.path, '/')
             let paths = req.path.split('/')
-
+            console.log(req.path, count)
             if (count > 1) {
                 if(this.url) {
                     let url = this.url.slice(1, this.url.length)
@@ -136,49 +212,23 @@ class NjUrl extends NjParser {
                 this.status = true
             } else if (!this.valueInArray(req.headers['Sec-Fetch-Dest'], this.noImageScriptsWorkersDocs) && this.__INDEX) {
                 if (this[this.__INDEX].views) {
+                    console.log(this.activated)
+
                     console.log('\x1b[33m%s\x1b[0m', req)
                     console.log('\x1b[34m%s\x1b[0m', req)
                     this.activated = this[this.__INDEX].activateView(paths[1])
+
                     if (this.activated) this.status = true
                     else this.status = false
                 }
 
             } else {
                 this.status = false
+
             }
 
 
         }
-
-        if (loop) {
-            if (this.paths) {
-                for (const i in this.paths) {
-                    // console.log(this.paths[i].path, rqs.url)
-                    if(this.paths[i].path === req.path) {
-                        this.activated = this.paths[i]
-
-                        this.status = true
-                        // this.head = 200
-                        // if(this.paths[i].head) {
-                        //     this.head = this.paths[i].head
-                        // }
-
-                    }
-                    // else {
-                    //     this.status = 404
-                    //     this.head = 404
-                    //     this.active = 404
-
-                    // }
-                }
-
-            }
-        }
-
-
-
-
-
 
     }
 

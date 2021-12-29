@@ -24,14 +24,14 @@ class NjResponse extends NjSuper {
 
         if (type.includes('-')) {
             [contype, type] = type.split('-')
-        } 
+        }
 
         this.response = this.httpVersion + code + this.status + '\r\n\
 Access-Control-Allow-Origin: *\r\n\
 Connection: Keep-Alive\r\n\
 Content-Type: ' + type + '; ' + this.unicode + '\r\n\
 Keep-Alive: timeout=5, max=1000 \r\n\
-'       
+'
         if (this.rspHeaders.length > 0) {
             for (const i in this.rspHeaders) {
                 this.response = this.response + this.rspHeaders[i] + '\r\n'
@@ -54,13 +54,13 @@ Keep-Alive: timeout=5, max=1000 \r\n\
         } else {
             return this.response + '\r\n'
         }
-       
-        
+
+
     }
 
     codeRes(code, ext, rsp) {
         let conext = ''
-        if (ext === 'js' || ext === 'css' || ext === 'html') {
+        if (ext === 'javascript' || ext === 'css' || ext === 'html') {
             conext = 'text/'+ext
         } else {
             conext = ext
@@ -73,13 +73,11 @@ Keep-Alive: timeout=5, max=1000 \r\n\
     async load(text) {
         if (this.ext === 'css') {
             this.rspHeaders.push('JinLoad: UpdateCss')
-            
             this.response = this.codeRes(200, 'incomplete-text/css', this.jinload.css(text))
-            console.log(this.response)
-            
+
         } else {
             this.response = this.codeRes(200, '*/*', text.content)
-           
+
         }
     }
 
@@ -88,11 +86,10 @@ Keep-Alive: timeout=5, max=1000 \r\n\
         if (url.status == true) {
             if (url.activated) {
                 if (url.activated.headers) this.assign('this', url.activated.headers)
-
                 this.response = this.codeRes(200, this.ext, url.activated.rsp(this.request))
                 url.status = false
                 url.activated = false
-            } 
+            }
 
         }
     }
