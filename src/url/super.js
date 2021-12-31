@@ -26,35 +26,14 @@ class NjUrlSuper extends NjSuper {
 
             this.njfile = new NjFiles('njfile', {construct: false})
 
-            this.njfile.defineFile('njsuper', {path: this.nodemodulesdir + path.sep +'njsuper'+path.sep+'njsuper.js', string: true})
-            let load = ['', 'src', 'jinload', 'load.js']
-            let update = ['', 'src', 'jinload', 'update.js']
-            let css = ['', 'src', 'jinload', 'css.js']
-
-            let njsupercontent = this.njfile.njsuper.content
-            njsupercontent = njsupercontent.split('\n')
-            njsupercontent = njsupercontent.slice(0, njsupercontent.length - 2)
-            this.njfile.njsuper.content = njsupercontent.join('\n')
-
-            load = load.join(path.sep)
-            update = update.join(path.sep)
-            css = css.join(path.sep)
-            this.njfile.defineFile('jinload', {path: this.njnestdir + load, url: '/jinload.js', string: true})
-            this.njfile.defineFile('jincss', {path: this.njnestdir + css, url: '/jincss.js', string: true})
-            this.njfile.defineFile('jinupdate', {path: this.njnestdir + update, url: '/jinupdate.js', string: true})
-
-
-            this.njfile.jinload.content = this.njfile.njsuper.content + this.njfile.jincss.content + this.njfile.jinload.content
-            this.njfile.jinupdate.content = this.njfile.njsuper.content + this.njfile.jinupdate.content
-            delete this.jincss
-            delete this.njfile.njsuper
+            this.njfile.defineFile('jinload', {path: this.nodemodulesdir + path.sep +'jinload'+path.sep+'jinload.js.build', url: '/jinload.js', string: true})
+            this.njfile.defineFile('jinupdate', {path: this.nodemodulesdir + path.sep +'jinload'+path.sep+'src'+path.sep+'update.js', url: '/jinupdate.js', string: true})
 
             let jsloads = ["document.onreadystatechange = function () { \r\n \
                 if(document.readyState === 'complete') {\r\n \
                 onJinLoad('ready')\r\n "]
 
             if (this.jinload) {
-
                 for (const i in this.jinload) {
                     if (this.jinload[i].includes('js')) {
                         jsloads.push("        jinload.js('"+this.jinload[i].split('.')[0]+"')\r\n")

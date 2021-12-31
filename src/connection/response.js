@@ -1,12 +1,12 @@
 
 const { NjSuper } = require('njsuper')
-const { JinLoads } = require('../jinload/jinload')
+const { NJinLoads } = require('jinload')
 
 class NjResponse extends NjSuper {
     constructor(dt, objx) {
         super(dt, objx)
         this.unicode = 'charset=utf-8'
-        this.jinload = new JinLoads()
+        this.jinload = new NJinLoads()
         this.rspHeaders = []
     }
 

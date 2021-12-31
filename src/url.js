@@ -1,6 +1,6 @@
 const { NjUrlResponse } = require('./url/response')
 const { NjParser } = require('./parse')
-const { JinLoad } = require('./jinload/jinload')
+const { NJinLoad } = require('jinload')
 const { NjFiles, NjFile } = require('njfile')
 
 class NjUrl extends NjParser {
@@ -122,7 +122,7 @@ class NjUrl extends NjParser {
         options.name = name
         if (options.url) path = options.url
         else if (options.path)  path = options.path
-        if (options.JINLOAD && !path.includes('.')) this.JinLoad = new JinLoad({lastLoads: options.JINLOAD}, this.JinLoad); delete options.JINLOAD
+        if (options.JINLOAD && !path.includes('.')) this.JinLoad = new NJinLoad({lastLoads: options.JINLOAD}, this.JinLoad); delete options.JINLOAD
         if (this.url) url = {path: this.url + path}
         else url = {path}
 
