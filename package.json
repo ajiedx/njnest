@@ -1,6 +1,6 @@
 {
   "name": "njnest",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Node.js API&WEB HTTP Server",
   "main": "njnest.js",
   "directories": {
@@ -32,6 +32,7 @@
     "jinload": "^1.0.1",
     "njfile": "^1.2.3",
     "njreload": "^1.3.2",
-    "njsuper": "^1.0.5"
+    "njsuper": "^1.0.5",
+    "njx1": "^1.0.1"
   }
 }
