@@ -6,14 +6,13 @@ const { NjWatcher } = require('./nest/watcher')
 const { NjReload } = require('njreload')
 const { NjSuper } = require('njsuper')
 const { NjParser } = require('./parse')
+const { NjGhost } = require('./nest/ghost')
 
 class NjNest extends NjSuper {
     constructor(dt, objx, t) {
         super(dt, objx, t)
         objx.urls = this.dt
-        // for (const i in objx.urls) {
-        //     objx.urls[i].onAndOn()
-        // }
+
         this.conn = new NjConnection(dt, objx)
     }
 

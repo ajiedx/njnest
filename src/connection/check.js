@@ -56,7 +56,6 @@ class NjCheck extends NjResponse {
     async checkReload(data) {
         const [firstLine, ...otherLines] = data.toString().split('\n')
         const [perspective, path, network] = firstLine.trim().split(' ')
-        console.log(path)
         if (this.isIntro('RELOAD', perspective)) {
             if (this.isIntro('/jinload', path)) {
                 this.reloadFile = path.split('/')
@@ -112,8 +111,18 @@ class NjCheck extends NjResponse {
             if (this.urls[i].jsDir) {
                 if (this.headers['JinLoad']) {
                     if (this.headers['Event'] === 'load') {
-                        if (this.headers['JinLoadName'] ) {
-                            this.response = this.codeRes(200, '*/*', this.urls[i].JinLoad.rsp(this.headers['JinLoadName']))
+                        if (this.headers['JinLoadName']) {
+                            if (this.headers['JinLoadName'] === 'views') {
+                                this.headers['JinLoadName'] = 'default'
+                                this.urls[i].status = true
+                                this.urls[i].activated = this.urls[i][this.urls[i].__INDEX].activateView('default')
+                                console.log(this.urls[i].activated, 'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk')
+                                this.ext = '*/*'
+                                this.qualify(this.urls[i])
+                            } else {
+                                this.response = this.codeRes(200, '*/*', this.urls[i].JinLoad.rsp(this.headers['JinLoadName']))
+                            }
+                            
                             if (!this.response) {
                                 this.response = this.codeRes(400, this.ext, 'Not Found')
                             }
