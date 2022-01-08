@@ -1,6 +1,6 @@
 {
   "name": "njnest",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Node.js API&WEB HTTP Server",
   "main": "njnest.js",
   "directories": {
