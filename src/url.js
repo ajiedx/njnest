@@ -68,7 +68,6 @@ class NjUrl extends NjParser {
         if (this.jinload) {
             for (const i in this.njfile) {
                 if(this.njfile[i] instanceof NjFile) {
-                    console.log(this.njfile[i].url)
                     this.on(this.njfile[i].url, {
                         rsp: () => {
                             return this.njfile[i].content
@@ -93,9 +92,7 @@ class NjUrl extends NjParser {
             this.on('/favicon.ico', {
                 rsp: () => {
                     const { readFileSync, statSync } = require('fs')
-                    console.log(__dirname)
                     const file = readFileSync('./public/favicon.ico').toString()
-                    console.log(file)
                     return file
                 }
             })
@@ -168,7 +165,6 @@ class NjUrl extends NjParser {
                     if(this.paths[i].path === req.path) {
                         this.status = true
                         this.activated = this.paths[i]
-                        console.log(this.activated, 'kkkkkkkkkkkkkkkkkkkk')
                         break
                     } else {
                         this.status = false
@@ -178,7 +174,6 @@ class NjUrl extends NjParser {
         } else if(req.path.includes('/')) {
             let count = this.countChars(req.path, '/')
             let paths = req.path.split('/')
-            console.log(req.path, count)
             if (count > 1) {
                 if(this.url) {
                     let url = this.url.slice(1, this.url.length)
@@ -212,10 +207,9 @@ class NjUrl extends NjParser {
                 this.status = true
             } else if (!this.valueInArray(req.headers['Sec-Fetch-Dest'], this.noImageScriptsWorkersDocs) && this.__INDEX) {
                 if (this[this.__INDEX].views) {
-                    console.log(this.activated)
 
-                    console.log('\x1b[33m%s\x1b[0m', req)
-                    console.log('\x1b[34m%s\x1b[0m', req)
+                    // console.log('\x1b[33m%s\x1b[0m', req)
+                    // console.log('\x1b[34m%s\x1b[0m', req)
                     this.activated = this[this.__INDEX].activateView(paths[1])
 
                     if (this.activated) this.status = true

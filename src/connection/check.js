@@ -116,11 +116,10 @@ class NjCheck extends NjResponse {
                                 this.headers['JinLoadName'] = 'default'
                                 this.urls[i].status = true
                                 this.urls[i].activated = this.urls[i][this.urls[i].__INDEX].activateView('default')
-                                console.log(this.urls[i].activated, 'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk')
-                                this.ext = '*/*'
+                                this.ext = 'incomplete-*/*'
                                 this.qualify(this.urls[i])
                             } else {
-                                this.response = this.codeRes(200, '*/*', this.urls[i].JinLoad.rsp(this.headers['JinLoadName']))
+                                this.response = this.codeRes(200, 'incomplete-*/*', this.urls[i].JinLoad.rsp(this.headers['JinLoadName']))
                             }
                             
                             if (!this.response) {
@@ -148,8 +147,9 @@ class NjCheck extends NjResponse {
                     if (this.urls[i].activated instanceof NjUrlResponse) {
                         this.qualify(this.urls[i])
                     } else if (this.urls[i].activated instanceof NjView) {
-                        this.ext = '*/*'
+                        this.ext = 'incomplete-*/*'
                         this.qualify(this.urls[i])
+                        
                     } else {
                         this.response = this.codeRes(400, this.ext, 'Not Found')
                         this.urls[i].status = false

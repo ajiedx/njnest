@@ -12,7 +12,6 @@ class NjUrlResponse extends NjSuper {
 
                 if(this.controller == 'default') {
                     if (this.sql) {
-                        console.log(this.sqlName)
                         if (this.sqlName === 'mysql') {
                             const { NjMysqlController } = require('../sql/mysqlcontroller')
                             this.controller = new NjMysqlController('NjMysqlController', this)
