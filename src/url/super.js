@@ -1,13 +1,16 @@
-const { NjSuper } = require('njsuper')
-const { NjUrlResponse } = require('./response')
+const { NjTools } = require('../nest/tools')
 const { NjFile, NjFiles } = require('njfile')
+const { NjGhost } = require('../nest/ghost')
 
-
-class NjUrlSuper extends NjSuper {
+class NjUrlSuper extends NjTools {
     constructor(dt, objx, t) {
         super(dt, objx, t)
         this.urlpth = []
+        this.ghost = new NjGhost()
+        this.tools = new NjTools()
+        this.ghost.sha256(this.random(5)+this.dt)
         
+        this.key = this.ghost.digest()
         if (objx.paths) this.addArray(this.urlpth, objx.paths)
         if (objx.urls) this.addArray(this.urlpth, objx.urls)
 
@@ -27,8 +30,11 @@ class NjUrlSuper extends NjSuper {
             this.njfile = new NjFiles('njfile', {construct: false})
 
             this.njfile.defineFile('jinload', {path: this.nodemodulesdir + path.sep +'jinload'+path.sep+'jinload.js.build', url: '/jinload.js', string: true})
-            this.njfile.defineFile('jinupdate', {path: this.nodemodulesdir + path.sep +'jinload'+path.sep+'src'+path.sep+'update.js', url: '/jinupdate.js', string: true})
+            let filecomplete = {}            
 
+            this.njfile.defineFile('jinupdate', {path: this.nodemodulesdir + path.sep +'jinload'+path.sep+'src'+path.sep+'update.js', url: '/jinupdate.js', string: true})
+            
+            this.pin(filecomplete, {before: 'this.viloads = {}', new: "this.njkey = '"+this.key+"'"})
             let jsloads = ["document.onreadystatechange = function () { \r\n \
                 if(document.readyState === 'complete') {\r\n \
                 onJinLoad('ready')\r\n "]
@@ -47,7 +53,8 @@ class NjUrlSuper extends NjSuper {
                 jsloadrn = jsloadrn + jsloads[i]
             }
 
-            this.njfile.jinload.content = this.njfile.jinload.content + jsloadrn
+            this.pin(filecomplete, {after: 'jinload = new JinLoad()', new: jsloadrn})
+            this.njfile.jinload.content = this.tools.strPlace(this.njfile.jinload.content, filecomplete)
         }
 
         if (this.jsDir) {
