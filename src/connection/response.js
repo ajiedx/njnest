@@ -10,15 +10,14 @@ class NjResponse extends NjSuper {
         this.rspHeaders = []
     }
 
-    head(code, type) {
-
+    head(num, type) {
         this.inside = ''
         let contype = ''
-        if (code === 401) {
+        if (num === 401) {
             this.status = ' Unathorized'
-        } else if (code === 200) {
+        } else if (num === 200) {
             this.status = ' OK'
-        } else if (code === 400) {
+        } else if (num === 400) {
             this.status = ' Bad Request'
         }
 
@@ -26,7 +25,7 @@ class NjResponse extends NjSuper {
             [contype, type] = type.split('-')
         }
 
-        this.response = this.httpVersion + code + this.status + '\r\n\
+        this.response = this.httpVersion + num + this.status + '\r\n\
 Access-Control-Allow-Origin: *\r\n\
 Connection: Keep-Alive\r\n\
 Content-Type: ' + type + '; ' + this.unicode + '\r\n\
@@ -39,7 +38,7 @@ Keep-Alive: timeout=5, max=1000 \r\n\
             this.rspHeaders = []
         }
 
-        if (code === 401) {
+        if (num === 401) {
             this.inside = 'WWW-Authenticate: Basic realm="Login request.", charset= "UTF-8"\r\n'
         }
 
@@ -48,7 +47,6 @@ Keep-Alive: timeout=5, max=1000 \r\n\
         }
 
         this.response = this.response + this.inside
-
         if (contype === 'incomplete') {
             return this.response
         } else {
@@ -58,7 +56,8 @@ Keep-Alive: timeout=5, max=1000 \r\n\
 
     }
 
-    codeRes(code, ext, rsp) {
+    codeRes(num, ext, rsp) {
+        
         let conext = ''
         if (ext === 'javascript' || ext === 'css' || ext === 'html') {
             conext = 'text/'+ext
@@ -67,7 +66,7 @@ Keep-Alive: timeout=5, max=1000 \r\n\
         }
 
         if (!rsp) return false
-        else return this.head(code, conext) + rsp
+        else return this.head(num, conext) + rsp
     }
 
     async load(text) {

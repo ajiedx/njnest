@@ -15,32 +15,27 @@ class NjCheck extends NjResponse {
     }
 
     async rqs(data) {
-        const [firstLine, ...otherLines] = data.toString().split('\n')
-        const [perspective, path, network] = firstLine.trim().split(' ')
-
-        if(this.isIntro('HTTP', network)) {
-            this.httpVersion = network + ' '
-            const headers = Object.fromEntries(otherLines.filter(_=>_)
-            .map(line=>line.split(':').map(part=>part.trim()))
-            .map(([name, ...rest]) => [name, rest.join(' ')]))
-
-            this.request = {
-                perspective,
-                path,
-                network,
-                headers,
-            }
-            this.perspective = perspective
-            this.headers = headers
-        
-
+        let sort
+        this.request = {}
+        if (data[0] == 80 && data[1] == 79) {
+            data = data.toString().split('\n\r\n')
+            this.request = {body: data[1]}
+            data = data[0].split('\n')
+        } else {
+            data = data.toString().split('\n')
         }
-        // if (!this.isIntro('image', this.request.headers.Accept)) {
-        //     if (!path.includes('js') || !path.includes('css')) {
-        //         console.log('\x1b[33m%s\x1b[0m', this.request)
-        //         console.log('\x1b[34m%s\x1b[0m', this.request.headers)
-        //     }
-        // }
+
+        const [perspective, path, network] = data[0].trim().split(' ')
+        if(this.isIntro('HTTP', network)) this.httpVersion = network + ' '
+        Object.assign(this.request, {perspective, path, network})
+        this.headers = {}
+        for (let i = 1; i < data.length; i++) {
+            sort = this.splitOnceChars(data[i], ':', 'diss') 
+            this.headers[sort[0]] = sort[1].trim()
+        }
+        
+        Object.assign(this.request, {headers: this.headers})
+        this.perspective = perspective
     }
 
     async updateReload() {
@@ -111,7 +106,8 @@ class NjCheck extends NjResponse {
         for(const i in this.urls) {
             if (!this.valueInArray(this.headers['Sec-Fetch-Dest'], this.docSrciptsViewsImage) && this.headers['JinLoad'] !== 'views' && !this.headers.JinLoadName) {
                 if (!this.urls[i].jsDir) {
-
+                    this.urls[i].check(this.request)
+                    this.response = this.codeRes(200, '*/*', this.urls[i].activated.rsp(this.request))
                 }
             } else {
                 if (this.urls[i].jsDir) {
