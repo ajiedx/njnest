@@ -1,7 +1,7 @@
 const { NjSuper } = require('njsuper')
 const { NjViews } = require('../nest/views')
 
-class NjController extends NjSuper {
+class NjUrlController extends NjSuper {
     constructor(dt, objx) {
         super(dt, objx)
 
@@ -14,15 +14,15 @@ class NjController extends NjSuper {
             this.views = new NjViews('', {views: this.VIEWS, parent: this.name, construct: true})
         }
 
-        
+
     }
-    
+
     setId(id) {
         this.idx = id
+        this[id] = {}
     }
 
     crsp(rsp, req) {
-
         if (this.html) {
             return rsp(this, req).html.dt
         } else if (this.sql) {
@@ -32,4 +32,4 @@ class NjController extends NjSuper {
     }
 }
 
-module.exports = { NjController }
+module.exports = { NjUrlController }

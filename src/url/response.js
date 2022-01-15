@@ -1,42 +1,58 @@
 
 const { NjSuper } = require('njsuper')
 const { NjViews } = require('../nest/views')
-const { NjController } = require('./controller')
+const { NjUrlController } = require('./controller')
 
 class NjUrlResponse extends NjSuper {
     constructor(dt, objx, t) {
         super(dt, objx, t)
-        
+
         if (this.controller) {
             if (this.typeof(this.controller) == 'string') {
-
                 if(this.controller == 'default') {
                     if (this.sql) {
                         if (this.sqlName === 'mysql') {
                             const { NjMysqlController } = require('../sql/mysqlcontroller')
                             this.controller = new NjMysqlController('NjMysqlController', this)
                         }
-
-
                     } else {
-                        this.controller = new NjController('NjController', this)
+                        this.controller = new NjUrlController('NjUrlController', this)
                     }
 
                 }
             } else if (this.typeof(this.controller) == 'function') {
 
-            } else if (this.controller instanceof NjController) {
-                this.controller = new NjController('NjController', this)
-            } else if (this.instanceAll(NjController, this.controller)) {
+            } else if (this.controller instanceof NjUrlController) {
+                this.controller = new NjUrlController('NjUrlController', this)
+            } else if (this.instanceAll(NjUrlController, this.controller)) {
                 this.controller = new this.controller(this.controller.constructor.name, this)
             } else if (this.controller instanceof Object) {
                 this.controller = new this.controller(this)
+            }
+        } else {
+            if (this.sql) {
+                if (this.sqlName === 'mysql') {
+                    const { NjMysqlController } = require('../sql/mysqlcontroller')
+                    this.controller = new NjMysqlController('NjMysqlController', this)
+                }
+            } else {
+                this.controller = new NjUrlController('NjUrlController', this)
             }
         }
     }
 
     setId(id) {
         this.controller.setId(id)
+    }
+
+    setUrlTail(point, array) {
+        this.urlTail = []
+        let l = 0
+        for (let i = point + 1; i < array.length  ; i++) {
+            this.urlTail[l] = array[i]
+            l++
+        }
+        this.controller.urlTail = this.urlTail
     }
 
     activateView(view) {
@@ -66,7 +82,6 @@ class NjUrlResponse extends NjSuper {
             } else {
                 return this.controller.crsp(this.response, req)
             }
-
         } else {
             return this.response({html: this.html}, req)
         }

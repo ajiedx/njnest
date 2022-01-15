@@ -158,7 +158,7 @@ class NjUrl extends NjParser {
         this.urlRspfy(name, options)
     }
 
-    check(req, loop) {
+    check(req) {
         if (req.path.includes('.')) {
             if (this.paths) {
                 for (const i in this.paths) {
@@ -185,6 +185,7 @@ class NjUrl extends NjParser {
                         if (this[paths[i]].idx) {
                             this.activated = this[paths[i]]
                             this.activated.setId(paths[i + 1])
+                            this.activated.setUrlTail(i, paths)
                             break
                         } else if (this[paths[i]].views) {
                             if (!this.valueInArray(req.headers['Sec-Fetch-Dest'], this.noImageScriptsWorkersDocs)) {

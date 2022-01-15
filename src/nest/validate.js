@@ -1,5 +1,6 @@
 const { NjSuper } = require('njsuper')
-const { NjController } = require('../url/controller')
+const { NjJson } = require('../parse/json')
+const { NjController } = require('./controller')
 
 class NjValidate extends NjController {
     constructor(dt, objx) {
@@ -8,17 +9,13 @@ class NjValidate extends NjController {
     }
 
     async validate(req) {
-        // json
+        const json = JSON.parse(this.body)
 
-        const json = JSON.parse('{"info": { "username": 123, "name": "James" }}')
-        console.log(json)
-
-        if (req.perspective === 'GET')
-            
+        if (this.perspective === 'POST' && this.perspective === 'PATCH')
             for (const i in this) {
                 if (this[i] instanceof NjJson) {
-                    
                     for (const l in json) {
+                        
                         if (i === l) {
                             let count = 0
                             let invalid = []

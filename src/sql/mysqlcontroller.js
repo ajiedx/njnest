@@ -6,9 +6,10 @@ const { NjValidate } = require('../nest/validate')
 class NjMysqlController extends NjValidate {
     constructor(dt, objx) {
         super(dt, objx)
+
         this.sql.tablename(this.name)
         if (this.fields) {
-            
+
             for (const i in this.fields) {
                 let count = 0
                 if (i.includes('__')) {
@@ -25,7 +26,7 @@ class NjMysqlController extends NjValidate {
                         for (const c in this.fields[i]) {
                             count = count + 1
                         }
-                    } 
+                    }
                     
 
                     if (name[1] === 'JSON') {
@@ -39,7 +40,7 @@ class NjMysqlController extends NjValidate {
                         delete this[name[0]].dt
                     }
                     
-                    
+                     
 
                 } else {
                     console.log('Provide type for "' + i + '" Through "field__TYPENAME"')
@@ -59,7 +60,7 @@ class NjMysqlController extends NjValidate {
         // const sm = rows.serverStatus
         const res = results
 
-        // console.log(res);
+        console.log(results);
 
     }
 
@@ -67,13 +68,12 @@ class NjMysqlController extends NjValidate {
         let clonedata = data
         data = ''
         for (const i in clonedata) {
-            if(clonedata[i].includes('{')) {
-
-                clonedata[i] = clonedata[i].replace('{', "'{")
-                clonedata[i] = clonedata[i].replace('}', "}'")
-
+            if(this.isIntro('{', clonedata[i])) {
+                clonedata[i] = '\'' + clonedata[i]
+                if (this.isEnd('}', clonedata[i])) {
+                    clonedata[i] += '\''
+                }
             }
-
             if (clonedata.length - 1 == i) {
                 data = data + clonedata[i]
             } else {
@@ -81,16 +81,16 @@ class NjMysqlController extends NjValidate {
             }
 
         }
-
-        return '('+data +')'
-        return
+        return '(' +data +')';
     }
 
     async add(data) {
+
         if (arguments.length > 1) {
             data = this.mysqlify(arguments)
+        } else {
+            data = '(' + data + ')'
         }
-
         this.sql.insert(data)
         this.rest = true
         this.querify(this.sql.query)
@@ -104,7 +104,6 @@ class NjMysqlController extends NjValidate {
         if (options) {
             Object.assign(options, params)
         }
-
 
         if (this.field) {
             this.sql.selectJSON(this.field, by, show, options)
@@ -128,7 +127,7 @@ class NjMysqlController extends NjValidate {
     }
 
     async querify(sql, the) {
-        console.log(the)
+        console.log(the, 'asds', sql)
         if (!this.queries) {
             console.log(1)
             this.queries = [sql]
@@ -138,15 +137,22 @@ class NjMysqlController extends NjValidate {
         }
     }
 
-    
-
-  
 
     async exec(req) {
-        
-        if (!this.rest) {
-            this.validate(req)
+
+        if (req === 'showIdx') {
+            this.showByJson(this.idx, this.id, {
+                field: 'info'
+            })
+            delete this.idx
+        } else if (req === 'newIdx') {
+            // if (!this.rest && req.body) {
+            //     this.validate(req)
+            // }
+            console.log(this.body)
+            this.add( this.body, 'NOW()')
         }
+
         if (this.sqlRequest) {
             if (this.queries) {
                 for (const i in this.queries) {
